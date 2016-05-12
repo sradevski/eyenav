@@ -3,6 +3,7 @@ define(function (require, exports, module) {
   'use strict';
   
   var EditorManager = brackets.getModule("editor/EditorManager");
+  var _self = this;
   
   //ToDo: Figure out how to detect whether it is full screen or not
   var isFullScreen = function(){
@@ -38,7 +39,7 @@ define(function (require, exports, module) {
   };
   
   var getScreenMaxNumOfLines = function () {
-    var editorCoodrdInfo = getCurrentEditorSizeAndCoords();
+    var editorCoordInfo = getCurrentEditorSizeAndCoords();
     var charSize = getCharSize();
 
     var visibleLines = ~~(editorCoordInfo.height / charSize.height);

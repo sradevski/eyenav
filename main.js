@@ -6,7 +6,7 @@ define(function (require, exports, module) {
     AppInit = brackets.getModule("utils/AppInit"),
     NodeDomain = brackets.getModule("utils/NodeDomain");
 
-  var init = require("eyeNavigateLogic/init");
+  var init = require("eyenavigate-logic/init");
   var DOMAIN_NAME = "eyeNavigate";
 
   //Registering the module that connects the eyetribe sdk and the brackets extension.

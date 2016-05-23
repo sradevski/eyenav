@@ -7,50 +7,93 @@ define(function (require, exports, module) {
     commandToggle: {
       keyCode: 18,
       location: 2,
-      btnName: "rightAlt",
+      btnName: 'rightAlt',
       isPressed: false,
+      releaseAfterFunc : false,
       func: function () {
         return 0;
       }
     },
     freeMove: {
-      keyCode: 70,
+      keyCode: 76,
       location: 0,
-      btnName: "F",
+      btnName: 'L',
       isPressed: false,
-      func: require("./movements").cursorClick
+      releaseAfterFunc : false,
+      func: require('./movements').cursorClick
     },
     click: {
-      keyCode: 65,
+      keyCode: 81,
       location: 0,
-      btnName: "A",
+      btnName: 'Q',
       isPressed: false,
-      //Future: This is not very clean, refactor it. Letter Buttons call the keydown event many times if you hold the button, so find a way where that doesnt happen.
-      func: function (gazeData) {
-        require("./movements").cursorClick(gazeData);
-        require("./keyManager").setKeyReleased(keys.click);
-      }
+      releaseAfterFunc : true,
+      //Future: This is not very clean, refactor it. Letter Buttons call the keydown event many times if you hold the button, so find a way where that doesnt happen. There are other keys with the same problem, handle those also.
+      func: require('./movements').cursorClick
     },
     verticalScroll: {
-      keyCode: 83,
-      location: 0,
-      btnName: "S",
+      keyCode: 16,
+      location: 1,
+      btnName: 'Left Shift',
       isPressed: false,
-      func: require("./movements").verticalScroll
+      releaseAfterFunc : false,
+      func: require('./movements').verticalScroll
     },
     verticalCursorScroll: {
-      keyCode: 87,
+      keyCode: 70,
       location: 0,
-      btnName: "W",
+      btnName: 'F',
       isPressed: false,
-      func: require("./movements").verticalCursorScroll
+      releaseAfterFunc : false,
+      func: require('./movements').verticalCursorScroll
     },
     horizontalCursorScroll: {
+      keyCode: 82,
+      location: 0,
+      btnName: 'R',
+      isPressed: false,
+      releaseAfterFunc : false,
+      func: require('./movements').horizontalCursorScroll
+    },
+    cursorUp: {
+      keyCode: 87,
+      location: 0,
+      btnName: 'W',
+      isPressed: false,
+      releaseAfterFunc : true,
+      func:require('./movements').arrowKeysMovements('up')
+    },
+    cursorDown: {
+      keyCode: 83,
+      location: 0,
+      btnName: 'S',
+      isPressed: false,
+      releaseAfterFunc : true,
+      func: require('./movements').arrowKeysMovements('down')
+    },
+    cursorLeft: {
+      keyCode: 65,
+      location: 0,
+      btnName: 'A',
+      isPressed: false,
+      releaseAfterFunc : true,
+      func: require('./movements').arrowKeysMovements('left')
+    },
+    cursorRight: {
       keyCode: 68,
       location: 0,
-      btnName: "D",
+      btnName: 'D',
       isPressed: false,
-      func: require("./movements").horizontalCursorScroll
+      releaseAfterFunc : true,
+      func: require('./movements').arrowKeysMovements('right')
+    },
+    selectHoveredWord: {
+      keyCode: 80,
+      location: 0,
+      btnName: 'P',
+      isPressed: false,
+      releaseAfterFunc : true,
+      func: require('./movements').selectHoveredWord
     }
   };
 

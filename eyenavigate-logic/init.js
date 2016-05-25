@@ -9,17 +9,20 @@ define(function (require, exports, module) {
     eventManager = require('./eventManager'),
     keyManager = require('./keyManager');
 
+    //ToDo: Put menu in a proper bar menu, put menu.addMenuDivider()
     var MY_COMMAND_ID = 'stevche.radevski.eyeNavigate';
     prefs.definePreference('enabled', 'boolean', true);
     
     var menuToggle = function () {
       var command = CommandManager.get(MY_COMMAND_ID);
       if (command.getChecked()) {
-        eventManager.toggleTool(false, command, eyeNavigateDomain);
+        eventManager.toggleTool(false, eyeNavigateDomain);
         prefs.set('enabled', false);
+        command.setChecked(false);
       } else {
-        eventManager.toggleTool(true, command, eyeNavigateDomain);
-        //prefs.set('enabled', true);
+        eventManager.toggleTool(true, eyeNavigateDomain);
+        prefs.set('enabled', true);
+        command.setChecked(true);
       }
     };
 
@@ -28,5 +31,6 @@ define(function (require, exports, module) {
     
     menu.addMenuItem(MY_COMMAND_ID);
     command.setChecked(prefs.get('enabled'));
+    eventManager.toggleTool(prefs.get('enabled'), eyeNavigateDomain);
   };
 });

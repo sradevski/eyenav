@@ -1,11 +1,20 @@
 define(function (require, exports, module) {
   'use strict';
 
-  var EditorManager = brackets.getModule('editor/EditorManager');
+  var EditorManager = brackets.getModule('editor/EditorManager'),
+    FileTreeView = brackets.getModule('project/FileTreeView'),
+    WorkingSetView = brackets.getModule('project/WorkingSetView'),
+    MainViewManager = brackets.getModule('view/MainViewManager'),
+    ProjectManager = brackets.getModule('project/ProjectManager');
 
-  var logEditorVariables = function(){
+  var logEditorVariables = function () {
     console.log(window.screen);
     console.log(EditorManager.getCurrentFullEditor());
+    console.log(FileTreeView);
+    console.log(WorkingSetView);
+    console.log(ProjectManager);
+    console.log(MainViewManager._getPane(MainViewManager.ACTIVE_PANE));
+
     console.log('Height: ' + window.innerHeight);
     console.log('Width: ' + window.innerWidth);
     console.log('outerHeight: ' + window.outerHeight);

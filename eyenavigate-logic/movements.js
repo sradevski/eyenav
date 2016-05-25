@@ -7,6 +7,8 @@ define(function (require, exports, module) {
     loggerForTest = require('./loggerForTest');
 
   var SPEED_FACTOR = 100;
+  var EPSYLON_PERCENTAGE = 0.08;
+  
   var verticalScrollCharacterPos = null;
 
   //Future: Normalize the gaze data at the bridge level.
@@ -45,13 +47,18 @@ define(function (require, exports, module) {
   var calculateYScrollVelocity = function (gazeData) {
     var editorCoordInfo = editorVariableManager.getCurrentEditorSizeAndCoords();
     var normalizedGazeData = normalizeGazeDataXY(gazeData, editorCoordInfo);
+    var midPoint = editorCoordInfo.height / 2;
+    var epsylon = editorCoordInfo.height * EPSYLON_PERCENTAGE;
     var speedFactor = SPEED_FACTOR / editorCoordInfo.height;
     var velocityY = 0;
 
-    if (normalizedGazeData.y <= editorCoordInfo.height) {
-      velocityY = (normalizedGazeData.y - (editorCoordInfo.height / 2)) * speedFactor;
+    //Check if the user is looking close to the center
+    if (Math.abs(normalizedGazeData.y - midPoint) > epsylon) {
+      //Check if the user is looking inside the editor window
+      if (normalizedGazeData.y > 0 || normalizedGazeData.y <= editorCoordInfo.height) {
+        velocityY = (normalizedGazeData.y - midPoint) * speedFactor;
+      }
     }
-
     return velocityY;
   };
 
@@ -107,6 +114,7 @@ define(function (require, exports, module) {
     return function () {
       var curEditor = EditorManager.getCurrentFullEditor();
       var cursorPos = curEditor.getCursorPos();
+      
       var goalCursorPos = {
         ch: cursorPos.ch,
         line: cursorPos.line

@@ -1,0 +1,36 @@
+<h1>eyenavigate-logic/init</h1>
+<pre><code class="lang-js">define(<span class="function"><span class="keyword">function</span> <span class="params">(require, exports, module)</span> {</span>
+  <span class="string">'use strict'</span>;
+  module.exports = <span class="function"><span class="keyword">function</span> <span class="params">(eyeNavigateDomain)</span> {</span>
+    <span class="keyword">var</span> Menus = brackets.getModule(<span class="string">'command/Menus'</span>),
+    CommandManager = brackets.getModule(<span class="string">'command/CommandManager'</span>),
+    EditorManager = brackets.getModule(<span class="string">'editor/EditorManager'</span>),
+    PreferencesManager = brackets.getModule(<span class="string">'preferences/PreferencesManager'</span>),
+    prefs = PreferencesManager.getExtensionPrefs(<span class="string">'eyeNavigate'</span>),
+    eventManager = require(<span class="string">'./eventManager'</span>);
+
+    <span class="comment">//ToDo: Put menu in a proper bar menu, put menu.addMenuDivider()</span>
+    <span class="keyword">var</span> MY_COMMAND_ID = <span class="string">'stevche.radevski.eyeNavigate'</span>;
+    prefs.definePreference(<span class="string">'enabled'</span>, <span class="string">'boolean'</span>, <span class="literal">true</span>);
+    
+    <span class="keyword">var</span> menuToggle = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">var</span> command = CommandManager.get(MY_COMMAND_ID);
+      <span class="keyword">if</span> (command.getChecked()) {
+        eventManager.toggleTool(<span class="literal">false</span>, eyeNavigateDomain);
+        prefs.set(<span class="string">'enabled'</span>, <span class="literal">false</span>);
+        command.setChecked(<span class="literal">false</span>);
+      } <span class="keyword">else</span> {
+        eventManager.toggleTool(<span class="literal">true</span>, eyeNavigateDomain);
+        prefs.set(<span class="string">'enabled'</span>, <span class="literal">true</span>);
+        command.setChecked(<span class="literal">true</span>);
+      }
+    };
+
+    <span class="keyword">var</span> command = CommandManager.register(<span class="string">'Eye Navigate'</span>, MY_COMMAND_ID, menuToggle);
+    <span class="keyword">var</span> menu = Menus.getMenu(Menus.AppMenuBar.FILE_MENU);
+    
+    menu.addMenuItem(MY_COMMAND_ID);
+    command.setChecked(prefs.get(<span class="string">'enabled'</span>));
+    eventManager.toggleTool(prefs.get(<span class="string">'enabled'</span>), eyeNavigateDomain);
+  };
+});</code></pre>

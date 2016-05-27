@@ -11,7 +11,15 @@ define(function (require, exports, module) {
       isPressed: false,
       releaseAfterFunc : false,
       func: function () {
-        return 0;
+      }
+    },
+    textSelection: {
+      keyCode: 16,
+      location: 1,
+      btnName: 'Left Shift',
+      isPressed: false,
+      releaseAfterFunc : false,
+      func: function () {
       }
     },
     freeMove: {
@@ -32,9 +40,9 @@ define(function (require, exports, module) {
       func: require('./movements').cursorClick
     },
     verticalScroll: {
-      keyCode: 16,
-      location: 1,
-      btnName: 'Left Shift',
+      keyCode: 90,
+      location: 0,
+      btnName: 'Z',
       isPressed: false,
       releaseAfterFunc : false,
       func: require('./movements').verticalScroll
@@ -94,6 +102,38 @@ define(function (require, exports, module) {
       isPressed: false,
       releaseAfterFunc : true,
       func: require('./movements').selectHoveredWord
+    },
+    manualOffsetXPlus: {
+      keyCode: 39,
+      location: 0,
+      btnName: 'Right Arrow',
+      isPressed: false,
+      releaseAfterFunc : true,
+      func: require('./movements').setManualOffset(1, 0)
+    },
+    manualOffsetXMinus: {
+      keyCode: 37,
+      location: 0,
+      btnName: 'Left Arrow',
+      isPressed: false,
+      releaseAfterFunc : true,
+      func: require('./movements').setManualOffset(-1, 0)
+    },
+    manualOffsetYPlus: {
+      keyCode: 40,
+      location: 0,
+      btnName: 'Down Arrow',
+      isPressed: false,
+      releaseAfterFunc : true,
+      func: require('./movements').setManualOffset(0, 1)
+    },
+    manualOffsetYMinus: {
+      keyCode: 38,
+      location: 0,
+      btnName: 'Up Arrow',
+      isPressed: false,
+      releaseAfterFunc : true,
+      func: require('./movements').setManualOffset(0, -1)
     }
   };
 
@@ -114,7 +154,6 @@ define(function (require, exports, module) {
       key.isPressed = false;
     }
   };
-
 
   var getKeyFromCodeAndLocation = function (keyCode, keyLocation) {
     for (var k in keys) {

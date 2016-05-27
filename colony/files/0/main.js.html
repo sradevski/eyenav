@@ -1,0 +1,19 @@
+<h1>main.js</h1>
+<pre><code class="lang-js">define(<span class="function"><span class="keyword">function</span> <span class="params">(require, exports, module)</span> {</span>
+  <span class="string">'use strict'</span>;
+
+  <span class="comment">//This is how you load external modules.</span>
+  <span class="keyword">var</span> ExtensionUtils = brackets.getModule(<span class="string">'utils/ExtensionUtils'</span>),
+    AppInit = brackets.getModule(<span class="string">'utils/AppInit'</span>),
+    NodeDomain = brackets.getModule(<span class="string">'utils/NodeDomain'</span>);
+
+  <span class="keyword">var</span> init = require(<span class="string">'eyenavigate-logic/init'</span>);
+  <span class="keyword">var</span> DOMAIN_NAME = <span class="string">'eyeNavigate'</span>;
+
+  <span class="comment">//Registering the module that connects the eyetribe sdk and the brackets extension.</span>
+  <span class="keyword">var</span> eyeNavigateDomain = <span class="keyword">new</span> NodeDomain(DOMAIN_NAME, ExtensionUtils.getModulePath(module, <span class="string">'eyeTribeBridge.js'</span>));
+
+  AppInit.appReady(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    init(eyeNavigateDomain);
+  });
+});</code></pre>

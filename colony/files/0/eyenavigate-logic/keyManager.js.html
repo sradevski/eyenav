@@ -1,0 +1,182 @@
+<h1>keyManager.js</h1>
+<pre><code class="lang-js"><span class="comment">//Future: Maybe change everywhere from working with a key object to working with the key ID</span>
+define(<span class="function"><span class="keyword">function</span> <span class="params">(require, exports, module)</span> {</span>
+  <span class="string">'use strict'</span>;
+
+  <span class="comment">//Future: Manage function assignment in a way that will require for less dependencies.</span>
+  <span class="keyword">var</span> keys = {
+    commandToggle: {
+      keyCode: <span class="number">18</span>,
+      location: <span class="number">2</span>,
+      btnName: <span class="string">'rightAlt'</span>,
+      isPressed: <span class="literal">false</span>,
+      releaseAfterFunc : <span class="literal">false</span>,
+      func: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+        <span class="keyword">return</span> <span class="number">0</span>;
+      }
+    },
+    freeMove: {
+      keyCode: <span class="number">76</span>,
+      location: <span class="number">0</span>,
+      btnName: <span class="string">'L'</span>,
+      isPressed: <span class="literal">false</span>,
+      releaseAfterFunc : <span class="literal">false</span>,
+      func: require(<span class="string">'./movements'</span>).cursorClick
+    },
+    click: {
+      keyCode: <span class="number">81</span>,
+      location: <span class="number">0</span>,
+      btnName: <span class="string">'Q'</span>,
+      isPressed: <span class="literal">false</span>,
+      releaseAfterFunc : <span class="literal">true</span>,
+      <span class="comment">//Future: This is not very clean, refactor it. Letter Buttons call the keydown event many times if you hold the button, so find a way where that doesnt happen. There are other keys with the same problem, handle those also.</span>
+      func: require(<span class="string">'./movements'</span>).cursorClick
+    },
+    verticalScroll: {
+      keyCode: <span class="number">16</span>,
+      location: <span class="number">1</span>,
+      btnName: <span class="string">'Left Shift'</span>,
+      isPressed: <span class="literal">false</span>,
+      releaseAfterFunc : <span class="literal">false</span>,
+      func: require(<span class="string">'./movements'</span>).verticalScroll
+    },
+    verticalCursorScroll: {
+      keyCode: <span class="number">70</span>,
+      location: <span class="number">0</span>,
+      btnName: <span class="string">'F'</span>,
+      isPressed: <span class="literal">false</span>,
+      releaseAfterFunc : <span class="literal">false</span>,
+      func: require(<span class="string">'./movements'</span>).verticalCursorScroll
+    },
+    horizontalCursorScroll: {
+      keyCode: <span class="number">82</span>,
+      location: <span class="number">0</span>,
+      btnName: <span class="string">'R'</span>,
+      isPressed: <span class="literal">false</span>,
+      releaseAfterFunc : <span class="literal">false</span>,
+      func: require(<span class="string">'./movements'</span>).horizontalCursorScroll
+    },
+    cursorUp: {
+      keyCode: <span class="number">87</span>,
+      location: <span class="number">0</span>,
+      btnName: <span class="string">'W'</span>,
+      isPressed: <span class="literal">false</span>,
+      releaseAfterFunc : <span class="literal">true</span>,
+      func:require(<span class="string">'./movements'</span>).arrowKeysMovements(<span class="string">'up'</span>)
+    },
+    cursorDown: {
+      keyCode: <span class="number">83</span>,
+      location: <span class="number">0</span>,
+      btnName: <span class="string">'S'</span>,
+      isPressed: <span class="literal">false</span>,
+      releaseAfterFunc : <span class="literal">true</span>,
+      func: require(<span class="string">'./movements'</span>).arrowKeysMovements(<span class="string">'down'</span>)
+    },
+    cursorLeft: {
+      keyCode: <span class="number">65</span>,
+      location: <span class="number">0</span>,
+      btnName: <span class="string">'A'</span>,
+      isPressed: <span class="literal">false</span>,
+      releaseAfterFunc : <span class="literal">true</span>,
+      func: require(<span class="string">'./movements'</span>).arrowKeysMovements(<span class="string">'left'</span>)
+    },
+    cursorRight: {
+      keyCode: <span class="number">68</span>,
+      location: <span class="number">0</span>,
+      btnName: <span class="string">'D'</span>,
+      isPressed: <span class="literal">false</span>,
+      releaseAfterFunc : <span class="literal">true</span>,
+      func: require(<span class="string">'./movements'</span>).arrowKeysMovements(<span class="string">'right'</span>)
+    },
+    selectHoveredWord: {
+      keyCode: <span class="number">80</span>,
+      location: <span class="number">0</span>,
+      btnName: <span class="string">'P'</span>,
+      isPressed: <span class="literal">false</span>,
+      releaseAfterFunc : <span class="literal">true</span>,
+      func: require(<span class="string">'./movements'</span>).selectHoveredWord
+    },
+    manualOffsetXPlus: {
+      keyCode: <span class="number">39</span>,
+      location: <span class="number">0</span>,
+      btnName: <span class="string">'Right Arrow'</span>,
+      isPressed: <span class="literal">false</span>,
+      releaseAfterFunc : <span class="literal">true</span>,
+      func: require(<span class="string">'./movements'</span>).setManualOffset(<span class="number">1</span>, <span class="number">0</span>)
+    },
+    manualOffsetXMinus: {
+      keyCode: <span class="number">37</span>,
+      location: <span class="number">0</span>,
+      btnName: <span class="string">'Left Arrow'</span>,
+      isPressed: <span class="literal">false</span>,
+      releaseAfterFunc : <span class="literal">true</span>,
+      func: require(<span class="string">'./movements'</span>).setManualOffset(-<span class="number">1</span>, <span class="number">0</span>)
+    },
+    manualOffsetYPlus: {
+      keyCode: <span class="number">40</span>,
+      location: <span class="number">0</span>,
+      btnName: <span class="string">'Down Arrow'</span>,
+      isPressed: <span class="literal">false</span>,
+      releaseAfterFunc : <span class="literal">true</span>,
+      func: require(<span class="string">'./movements'</span>).setManualOffset(<span class="number">0</span>, <span class="number">1</span>)
+    },
+    manualOffsetYMinus: {
+      keyCode: <span class="number">38</span>,
+      location: <span class="number">0</span>,
+      btnName: <span class="string">'Up Arrow'</span>,
+      isPressed: <span class="literal">false</span>,
+      releaseAfterFunc : <span class="literal">true</span>,
+      func: require(<span class="string">'./movements'</span>).setManualOffset(<span class="number">0</span>, -<span class="number">1</span>)
+    }
+    
+  };
+
+  <span class="keyword">var</span> requiredKeys = [keys.commandToggle];
+  
+  <span class="keyword">var</span> isKeyPressed = <span class="function"><span class="keyword">function</span> <span class="params">(key)</span> {</span>
+    <span class="keyword">return</span> key.isPressed;
+  };
+
+  <span class="keyword">var</span> setKeyPressed = <span class="function"><span class="keyword">function</span> <span class="params">(key)</span> {</span>
+    <span class="keyword">if</span> (key) {
+      key.isPressed = <span class="literal">true</span>;
+    }
+  };
+
+  <span class="keyword">var</span> setKeyReleased = <span class="function"><span class="keyword">function</span> <span class="params">(key)</span> {</span>
+    <span class="keyword">if</span> (key) {
+      key.isPressed = <span class="literal">false</span>;
+    }
+  };
+
+  <span class="keyword">var</span> getKeyFromCodeAndLocation = <span class="function"><span class="keyword">function</span> <span class="params">(keyCode, keyLocation)</span> {</span>
+    <span class="keyword">for</span> (<span class="keyword">var</span> k <span class="keyword">in</span> keys) {
+      <span class="keyword">if</span> (keys[k].keyCode === keyCode &amp;&amp; keys[k].location === keyLocation)
+        <span class="keyword">return</span> keys[k];
+    }
+
+    <span class="keyword">return</span> <span class="literal">undefined</span>;
+  };
+
+  <span class="keyword">var</span> isValidKeyCommand = <span class="keyword">function</span>(key){
+    <span class="keyword">if</span>(key === keys.commandToggle){
+      <span class="keyword">return</span> <span class="literal">false</span>;
+    }
+
+    <span class="keyword">for</span> (<span class="keyword">var</span> k <span class="keyword">in</span> requiredKeys){
+      <span class="keyword">if</span> (!requiredKeys[k].isPressed){
+        <span class="keyword">return</span> <span class="literal">false</span>;
+      }  
+    }
+
+    <span class="keyword">return</span> isKeyPressed(key);
+  };
+
+  <span class="comment">//exports.populateWriterKeyDict = populateWriterKeyDict;</span>
+  exports.getKeyFromCodeAndLocation = getKeyFromCodeAndLocation;
+  exports.isValidKeyCommand = isValidKeyCommand;
+  exports.isKeyPressed = isKeyPressed;
+  exports.setKeyPressed = setKeyPressed;
+  exports.setKeyReleased = setKeyReleased;
+  exports.keys = keys;
+});</code></pre>

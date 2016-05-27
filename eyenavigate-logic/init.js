@@ -6,8 +6,7 @@ define(function (require, exports, module) {
     EditorManager = brackets.getModule('editor/EditorManager'),
     PreferencesManager = brackets.getModule('preferences/PreferencesManager'),
     prefs = PreferencesManager.getExtensionPrefs('eyeNavigate'),
-    eventManager = require('./eventManager'),
-    keyManager = require('./keyManager');
+    eventManager = require('./eventManager');
 
     //ToDo: Put menu in a proper bar menu, put menu.addMenuDivider()
     var MY_COMMAND_ID = 'stevche.radevski.eyeNavigate';

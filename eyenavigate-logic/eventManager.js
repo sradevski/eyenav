@@ -26,11 +26,21 @@ define(function (require, exports, module) {
     }
   };
 
+  var testingHowThisWorks = function(){
+    var itDoesntReally = false;
+    
+    if(isAbleToPublish()){
+      
+    }
+  };
   //This is the main loop of the program.
   var eyeTribeHanlder = function (info, gazeData) {
+    //Future: Refactor this so it complies with the other keys format. Think of a better way to manage the keys (having something like required each key adds an additional function if pressed or smth)
+    var selectionKeyOn = keys.textSelection.isPressed;
+    
     for (var key in keys) {
       if (keyManager.isValidKeyCommand(keys[key])) {
-        movements.executeMovement(keys[key].func, [gazeData]);
+        movements.executeMovement(keys[key].func, [gazeData, selectionKeyOn]);
 
         if (keys[key].releaseAfterFunc) {
           keyManager.setKeyReleased(keys[key]);

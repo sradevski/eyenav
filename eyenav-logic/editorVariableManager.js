@@ -1,4 +1,4 @@
-//This module uses the internal _codeMirror object, so it is fragile from future updates.
+//NOTE: This module uses the internal _codeMirror object, so it is fragile from future updates.
 define(function (require, exports, module) {
   'use strict';
 
@@ -7,21 +7,24 @@ define(function (require, exports, module) {
 
   var _self = this;
 
-  //Future: Figure out how to detect whether it is full screen or not
   var isFullScreen = function () {
+    if (window.innerHeight === window.screen.height && window.innerWidth === window.screen.width) {
+      return true;
+    }
+
     return false;
   };
 
   var getCurrentEditorSizeAndCoords = function () {
-    var curScreen = EditorManager.getCurrentFullEditor();
-    var cmDisplayObject = curScreen._codeMirror.display;
+    var curEditor = EditorManager.getCurrentFullEditor();
+    var cmDisplayObject = curEditor._codeMirror.display;
 
     var editorHeight = cmDisplayObject.lastWrapHeight;
     var editorWidth = cmDisplayObject.lineDiv.clientWidth;
     var gutterWidth = cmDisplayObject.gutters.clientWidth;
     var verticalScrollBarWidth = cmDisplayObject.barWidth;
-    var rightsideMenuWidth = 30;
-    var fileTreeBarWidth = window.innerWidth - gutterWidth - editorWidth - verticalScrollBarWidth - rightsideMenuWidth;
+    var rightSideMenuWidth = 30;
+    var fileTreeBarWidth = window.innerWidth - gutterWidth - editorWidth - verticalScrollBarWidth - rightSideMenuWidth;
 
     var topAppBarHeight = isFullScreen() ? 0 : 11;
     //Unnecessary, left for reference.

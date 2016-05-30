@@ -8,7 +8,6 @@ define(function (require, exports, module) {
 
   var keys = keyManager.keys;
 
-  //keyEvent is depricated, use keydown/press/up
   var keyEventHandler = function (bracketsEvent, editor, event) {
     var key = keyManager.getKeyFromCodeAndLocation(event.keyCode, event.location);
     //console.log('Key code: ' + event.keyCode + ', key location: ' + event.location);
@@ -26,18 +25,11 @@ define(function (require, exports, module) {
     }
   };
 
-  var testingHowThisWorks = function(){
-    var itDoesntReally = false;
-    
-    if(isAbleToPublish()){
-      
-    }
-  };
   //This is the main loop of the program.
-  var eyeTribeHanlder = function (info, gazeData) {
+  var eyeTrackerHandler = function (info, gazeData) {
     //Future: Refactor this so it complies with the other keys format. Think of a better way to manage the keys (having something like required each key adds an additional function if pressed or smth)
     var selectionKeyOn = keys.textSelection.isPressed;
-    
+
     for (var key in keys) {
       if (keyManager.isValidKeyCommand(keys[key])) {
         movements.executeMovement(keys[key].func, [gazeData, selectionKeyOn]);
@@ -50,6 +42,7 @@ define(function (require, exports, module) {
   };
 
   var activeEditorChangeHandler = function ($event, focusedEditor, lostEditor) {
+
     if (lostEditor) {
       lostEditor.off('keyup', keyEventHandler);
       lostEditor.off('keydown', keyEventHandler);
@@ -59,26 +52,36 @@ define(function (require, exports, module) {
       focusedEditor.on('keydown', keyEventHandler);
     }
   };
-  
+
   var toggleTool = function (toggle, domain) {
     var curEditor = EditorManager.getCurrentFullEditor();
-    
+    console.log(domain);
     if (toggle) {
       EditorManager.on('activeEditorChange', activeEditorChangeHandler);
       if (curEditor) {
         activeEditorChangeHandler(null, curEditor, null);
       }
-      domain.on('gazeChanged', eyeTribeHanlder);
-      domain.exec('start');
+      domain.on('gazeChanged', eyeTrackerHandler);
+      var $result = domain.exec('start');
+      
+      $result.done(function (value) {
+        console.log("the command succeeded!");
+      });
+
+      $result.fail(function (err) {
+        console.log("the command failed; act accordingly!");
+        console.log(err);
+      });
+
     } else {
       EditorManager.off('activeEditorChange', activeEditorChangeHandler);
       if (curEditor) {
         activeEditorChangeHandler(null, null, curEditor);
       }
-      domain.off('gazeChanged', eyeTribeHanlder);
+      domain.off('gazeChanged', eyeTrackerHandler);
       domain.exec('stop');
     }
   };
-
+  
   module.exports.toggleTool = toggleTool;
 });

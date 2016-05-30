@@ -1,0 +1,19 @@
+{
+  "name": "eyeNav",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Brackets Extension to Navigate Code with Eyetracking",
+  "keywords": [
+    "eye-tracking"
+  ],
+  "main": "main.js",
+  "author": {
+    "name": "Stevche Radevski",
+    "email": "sradevski@live.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://bitbucket.org/stevchesteam/eyenavigate"
+  },
+  "license": "MIT"
+}

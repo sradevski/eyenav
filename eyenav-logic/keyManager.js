@@ -136,8 +136,6 @@ define(function (require, exports, module) {
       func: require('./movements').setManualOffset(0, -1)
     }
   };
-
-  var requiredKeys = [keys.commandToggle];
   
   var isKeyPressed = function (key) {
     return key.isPressed;
@@ -152,6 +150,13 @@ define(function (require, exports, module) {
   var setKeyReleased = function (key) {
     if (key) {
       key.isPressed = false;
+      
+      //Reset all other keys if the command key is released
+      if(key === keys.commandToggle){
+        for(var k in keys){
+          keys[k].isPressed = false;
+        }
+      }
     }
   };
 
@@ -165,14 +170,8 @@ define(function (require, exports, module) {
   };
 
   var isValidKeyCommand = function(key){
-    if(key === keys.commandToggle){
+    if(key === keys.commandToggle || !keys.commandToggle.isPressed){
       return false;
-    }
-
-    for (var k in requiredKeys){
-      if (!requiredKeys[k].isPressed){
-        return false;
-      }  
     }
 
     return isKeyPressed(key);

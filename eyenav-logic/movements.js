@@ -6,8 +6,8 @@ define(function (require, exports, module) {
     editorVariableManager = require('./editorVariableManager'),
     loggerForTest = require('./loggerForTest');
 
-  var SPEED_FACTOR = 120;
-  var EPSYLON_PERCENTAGE = 0.1;
+  var SPEED_FACTOR = 80000;
+  var EPSYLON_PERCENTAGE = 10;
 
   var verticalScrollCharacterPos = null;
   var selectionStartPosition = null;
@@ -22,13 +22,12 @@ define(function (require, exports, module) {
     var curEditor = EditorManager.getCurrentFullEditor();
     var currentCursor = curEditor.getCursorPos();
 
-    if(isSelection && selectionStartPosition === null){
+    if (isSelection && selectionStartPosition === null) {
       selectionStartPosition = currentCursor;
-    }
-    else if (!isSelection && selectionStartPosition !== null){
+    } else if (!isSelection && selectionStartPosition !== null) {
       selectionStartPosition = null;
     }
-    
+
     curEditor.setCursorPos(line, character);
 
     if (selectionStartPosition) {
@@ -78,23 +77,30 @@ define(function (require, exports, module) {
   var calculateYScrollVelocity = function (gazeData) {
     var editorCoordInfo = editorVariableManager.getCurrentEditorSizeAndCoords();
     var normalizedGazeData = normalizeGazeDataXY(gazeData, editorCoordInfo);
-    var midPoint = editorCoordInfo.height / 2;
-    var epsylon = editorCoordInfo.height * EPSYLON_PERCENTAGE;
-    var speedFactor = SPEED_FACTOR / editorCoordInfo.height;
+    
     var velocityY = 0;
 
-    //Check if the user is looking close to the center
-    if (Math.abs(normalizedGazeData.y - midPoint) > epsylon) {
-      //Check if the user is looking inside the editor window
-      if (normalizedGazeData.y > 0 || normalizedGazeData.y <= editorCoordInfo.height) {
-        velocityY = (normalizedGazeData.y - midPoint - epsylon) * speedFactor;
+    var midPoint = editorCoordInfo.height / 2;
+    var epsylon = (editorCoordInfo.height / 100) * EPSYLON_PERCENTAGE;
+    var direction = normalizedGazeData.y - midPoint > 0 ? 1 : -1;
+    var speedFactor = SPEED_FACTOR / editorCoordInfo.height;
+    //From 0 to 1 for half screen (height / 2 - epsylon)
+    var normalizedYLocation = (Math.abs(normalizedGazeData.y - midPoint) - epsylon) / (midPoint - epsylon);
+
+    //Check if the user is looking inside the editor window
+    if (normalizedGazeData.y > 0 || normalizedGazeData.y <= editorCoordInfo.height) {
+      //Check if the user is looking away from the center for some epsylon outset.
+      if (Math.abs(normalizedGazeData.y - midPoint) > epsylon) {
+        velocityY = (Math.pow(normalizedYLocation, 2) * speedFactor) * direction;
       }
     }
+    
+    console.log("The velocity is: " + velocityY);
     return velocityY;
   };
 
   var cursorClick = function (gazeData, isSelection) {
-    //Future: Change this to the normalized access of the data.
+    //Future: Change this to the normalized access of the data. Do the checking somewhere else
     if (gazeData.avg.x !== 0 && gazeData.avg.y !== 0) {
       var offset = calculateCursorOffset(gazeData, false);
 
@@ -212,6 +218,7 @@ define(function (require, exports, module) {
   };
 
   //Future: Think of a more flexible implementation of this (including the checking of verticalCursorScroll)
+  //Future: Add logging of the action to be performed, the current cursor location, the gaze location, normalized gaze location, and the goal line. This can be used for research purposes. 
   var executeMovement = function (actionToExecute, funcArguments) {
     var curEditor = EditorManager.getCurrentFullEditor();
     var cursorPos = curEditor.getCursorPos();

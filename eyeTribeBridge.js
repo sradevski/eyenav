@@ -20,7 +20,18 @@
   };
 
   eye.on('gazeUpdate', function (gazeData, err) {
-    _domainManager.emitEvent(DOMAIN_NAME, 'gazeChanged', gazeData);
+    //Note: This is the gaze format used throughout eyeNav. It can be extended as needed by the requirements.
+    var eyeNavGazeFormattedData = {
+      x: gazeData.avg.x,
+      y: gazeData.avg.y,
+      raw: {
+        x: gazeData.raw.x,
+        y: gazeData.raw.y
+      },
+      timestamp: gazeData.timestamp
+    };
+    
+    _domainManager.emitEvent(DOMAIN_NAME, 'gazeChanged', eyeNavGazeFormattedData);
   });
 
   //Future: Use the connected and disconnected to manage connections properly.

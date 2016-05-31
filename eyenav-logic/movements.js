@@ -41,11 +41,11 @@ define(function (require, exports, module) {
     }
   };
 
-  //Future: Normalize the gaze data at the bridge level.
+  //It normalizes the xy coordinates having the top right corner of the editor as an origin.
   var normalizeGazeDataXY = function (gazeData, editorCoordInfo) {
     var normalizedData = {};
-    normalizedData.x = (gazeData.avg.x + manualOffset.x) - editorCoordInfo.x;
-    normalizedData.y = (gazeData.avg.y + manualOffset.y) - editorCoordInfo.y;
+    normalizedData.x = (gazeData.x + manualOffset.x) - editorCoordInfo.x;
+    normalizedData.y = (gazeData.y + manualOffset.y) - editorCoordInfo.y;
     return normalizedData;
   };
 
@@ -73,11 +73,9 @@ define(function (require, exports, module) {
     };
   };
 
-  //Future: Make velocity change exponential, not linear.
   var calculateYScrollVelocity = function (gazeData) {
     var editorCoordInfo = editorVariableManager.getCurrentEditorSizeAndCoords();
     var normalizedGazeData = normalizeGazeDataXY(gazeData, editorCoordInfo);
-    
     var velocityY = 0;
 
     var midPoint = editorCoordInfo.height / 2;
@@ -91,64 +89,48 @@ define(function (require, exports, module) {
     if (normalizedGazeData.y > 0 || normalizedGazeData.y <= editorCoordInfo.height) {
       //Check if the user is looking away from the center for some epsylon outset.
       if (Math.abs(normalizedGazeData.y - midPoint) > epsylon) {
-        velocityY = (Math.pow(normalizedYLocation, 2) * speedFactor) * direction;
+        velocityY = Math.pow(normalizedYLocation, 2) * speedFactor * direction;
       }
     }
-    
-    console.log("The velocity is: " + velocityY);
+
     return velocityY;
   };
 
   var cursorClick = function (gazeData, isSelection) {
-    //Future: Change this to the normalized access of the data. Do the checking somewhere else
-    if (gazeData.avg.x !== 0 && gazeData.avg.y !== 0) {
-      var offset = calculateCursorOffset(gazeData, false);
+    var offset = calculateCursorOffset(gazeData, false);
 
-      if (editorVariableManager.isGoalLineWithinBorders(offset.vertical)) {
-        makeCursorMovement(offset.vertical, offset.horizontal, isSelection);
-      }
+    if (editorVariableManager.isGoalLineWithinBorders(offset.vertical)) {
+      makeCursorMovement(offset.vertical, offset.horizontal, isSelection);
     }
   };
 
   var verticalScroll = function (gazeData) {
-    //Future: Change this to the normalized access of the data.
-    if (gazeData.avg.x !== 0 && gazeData.avg.y !== 0) {
+    var curEditor = EditorManager.getCurrentFullEditor();
+    var curScrollPos = curEditor.getScrollPos();
+    var velocity = calculateYScrollVelocity(gazeData);
 
-      var curEditor = EditorManager.getCurrentFullEditor();
-      var curScrollPos = curEditor.getScrollPos();
-      var velocity = calculateYScrollVelocity(gazeData);
-
-      curEditor.setScrollPos(curScrollPos.x, curScrollPos.y + velocity);
-    }
+    curEditor.setScrollPos(curScrollPos.x, curScrollPos.y + velocity);
   };
 
   var verticalCursorScroll = function (gazeData, isSelection) {
-    //Future: Change this to the normalized access of the data.
-    if (gazeData.avg.x !== 0 && gazeData.avg.y !== 0) {
+    var curEditor = EditorManager.getCurrentFullEditor();
+    var cursorPos = curEditor.getCursorPos();
+    var cursorOffset = calculateCursorOffset(gazeData, true);
 
-      var curEditor = EditorManager.getCurrentFullEditor();
-      var cursorPos = curEditor.getCursorPos();
-      var cursorOffset = calculateCursorOffset(gazeData, true);
+    var goalLinePos = cursorPos.line + cursorOffset.vertical;
 
-      var goalLinePos = cursorPos.line + cursorOffset.vertical;
-
-      if (editorVariableManager.isGoalLineWithinBorders(goalLinePos)) {
-        makeCursorMovement(goalLinePos, verticalScrollCharacterPos, isSelection);
-      }
+    if (editorVariableManager.isGoalLineWithinBorders(goalLinePos)) {
+      makeCursorMovement(goalLinePos, verticalScrollCharacterPos, isSelection);
     }
   };
 
   var horizontalCursorScroll = function (gazeData, isSelection) {
-    //Future: Change this to the normalized access of the data.
-    if (gazeData.avg.x !== 0 && gazeData.avg.y !== 0) {
+    var curEditor = EditorManager.getCurrentFullEditor();
+    var cursorPos = curEditor.getCursorPos();
+    var cursorOffset = calculateCursorOffset(gazeData, true);
 
-      var curEditor = EditorManager.getCurrentFullEditor();
-      var cursorPos = curEditor.getCursorPos();
-      var cursorOffset = calculateCursorOffset(gazeData, true);
-
-      var goalCursorPos = cursorPos.ch + cursorOffset.horizontal;
-      makeCursorMovement(cursorPos.line, goalCursorPos, isSelection);
-    }
+    var goalCursorPos = cursorPos.ch + cursorOffset.horizontal;
+    makeCursorMovement(cursorPos.line, goalCursorPos, isSelection);
   };
 
   var arrowKeysMovements = function (direction) {

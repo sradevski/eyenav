@@ -10,7 +10,6 @@ define(function (require, exports, module) {
 
   var keyEventHandler = function (bracketsEvent, editor, event) {
     var key = keyManager.getKeyFromCodeAndLocation(event.keyCode, event.location);
-    //console.log('Key code: ' + event.keyCode + ', key location: ' + event.location);
     if (key) {
       if (event.type === 'keydown') {
         keyManager.setKeyPressed(key);
@@ -27,15 +26,19 @@ define(function (require, exports, module) {
 
   //This is the main loop of the program.
   var eyeTrackerHandler = function (info, gazeData) {
-    //Future: Refactor this so it complies with the other keys format. Think of a better way to manage the keys (having something like required each key adds an additional function if pressed or smth)
-    var selectionKeyOn = keys.textSelection.isPressed;
 
-    for (var key in keys) {
-      if (keyManager.isValidKeyCommand(keys[key])) {
-        movements.executeMovement(keys[key].func, [gazeData, selectionKeyOn]);
+    //Usually when both values are zero it is because the tracker failed to locate the gaze.
+    if (gazeData.x !== 0 && gazeData.x !== 0) {
+      //Future: Refactor this so it complies with the other keys format. Think of a better way to manage the keys (having something like required each key adds an additional function if pressed or smth)
+      var selectionKeyOn = keys.textSelection.isPressed;
 
-        if (keys[key].releaseAfterFunc) {
-          keyManager.setKeyReleased(keys[key]);
+      for (var key in keys) {
+        if (keyManager.isValidKeyCommand(keys[key])) {
+          movements.executeMovement(keys[key].func, [gazeData, selectionKeyOn]);
+          console.log(gazeData);
+          if (keys[key].releaseAfterFunc) {
+            keyManager.setKeyReleased(keys[key]);
+          }
         }
       }
     }
@@ -63,7 +66,7 @@ define(function (require, exports, module) {
       }
       domain.on('gazeChanged', eyeTrackerHandler);
       var $result = domain.exec('start');
-      
+
       $result.done(function (value) {
         console.log("the command succeeded!");
       });
@@ -82,6 +85,6 @@ define(function (require, exports, module) {
       domain.exec('stop');
     }
   };
-  
+
   module.exports.toggleTool = toggleTool;
 });

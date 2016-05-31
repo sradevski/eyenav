@@ -36,7 +36,7 @@ define(function (require, exports, module) {
       btnName: 'Q',
       isPressed: false,
       releaseAfterFunc : true,
-      //Future: This is not very clean, refactor it. Letter Buttons call the keydown event many times if you hold the button, so find a way where that doesnt happen. There are other keys with the same problem, handle those also.
+      //Future: This is not very clean, refactor it.
       func: require('./movements').cursorClick
     },
     verticalScroll: {

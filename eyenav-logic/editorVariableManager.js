@@ -5,13 +5,10 @@ define(function (require, exports, module) {
   var EditorManager = brackets.getModule('editor/EditorManager'),
     TokenUtils = brackets.getModule('utils/TokenUtils');
 
-  var _self = this;
-
   var isFullScreen = function () {
     if (window.innerHeight === window.screen.height && window.innerWidth === window.screen.width) {
       return true;
     }
-
     return false;
   };
 
@@ -27,7 +24,8 @@ define(function (require, exports, module) {
     var fileTreeBarWidth = window.innerWidth - gutterWidth - editorWidth - verticalScrollBarWidth - rightSideMenuWidth;
 
     var topAppBarHeight = isFullScreen() ? 0 : 11;
-    //Unnecessary, left for reference.
+    
+    //Not used, left for reference.
     //var bottomDescriptionBarHeight = 15;
 
     var coords = {};
@@ -55,12 +53,10 @@ define(function (require, exports, module) {
     var cursorPos = curEditor.getCursorPos();
     var charSize = getCharSize();
 
-    var cursorCoords = {
+    return {
       x: cursorPos.ch * charSize.width,
       y: cursorPos.line * charSize.height
     };
-
-    return cursorCoords;
   };
 
   var getNumOfLines = function () {
@@ -68,33 +64,29 @@ define(function (require, exports, module) {
     var charSize = getCharSize();
     //Future: Figure out where the 30 pixels come from (which variable)
     var scrollerHeight = curEditor._codeMirror.display.scroller.children[0].clientHeight - 30;
-    var numOfLines = ~~(scrollerHeight / charSize.height);
-
-    return numOfLines;
+    
+    return ~~(scrollerHeight / charSize.height);
   };
 
-  var getScreenMaxNumOfLines = function () {
+  var getNumOfVisibleLines = function () {
     var editorCoordInfo = getCurrentEditorSizeAndCoords();
     var charSize = getCharSize();
 
-    var visibleLines = ~~(editorCoordInfo.height / charSize.height);
-
-    return visibleLines;
+    return ~~(editorCoordInfo.height / charSize.height);
   };
 
   var getScrolledLines = function () {
     var curEditor = EditorManager.getCurrentFullEditor();
     var scrollPos = curEditor.getScrollPos();
     var charSize = getCharSize();
-    var scrolledLines = ~~(scrollPos.y / charSize.height);
-
-    return scrolledLines;
+    
+    return ~~(scrollPos.y / charSize.height);
   };
 
   var isGoalLineWithinBorders = function (goalLine) {
     var numOfLines = getNumOfLines();
     var scrolledLines = getScrolledLines();
-    var maxLinesInScreen = getScreenMaxNumOfLines();
+    var maxLinesInScreen = getNumOfVisibleLines();
 
     if (goalLine >= scrolledLines && goalLine < (scrolledLines + maxLinesInScreen)) {
       return true;
@@ -103,7 +95,7 @@ define(function (require, exports, module) {
     return false;
   };
 
-  var getToken = function (cursorPos) {
+  var getTokenAtPos = function (cursorPos) {
     var curEditor = EditorManager.getCurrentFullEditor();
 
     if (cursorPos) {
@@ -119,8 +111,8 @@ define(function (require, exports, module) {
   exports.getCursorCoords = getCursorCoords;
   exports.getCharSize = getCharSize;
   exports.getNumOfLines = getNumOfLines;
-  exports.getScreenMaxNumOfLines = getScreenMaxNumOfLines;
+  exports.getNumOfVisibleLines = getNumOfVisibleLines;
   exports.getScrolledLines = getScrolledLines;
   exports.isGoalLineWithinBorders = isGoalLineWithinBorders;
-  exports.getToken = getToken;
+  exports.getTokenAtPos = getTokenAtPos;
 });

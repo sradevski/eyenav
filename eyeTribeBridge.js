@@ -1,13 +1,13 @@
-(function () {
+(function() {
   'use strict';
 
   var gazeManager = require('./eyetribe-sdk/GazeManager');
-  var eye = new gazeManager();
+  var eyeTribe = new gazeManager();
   var _domainManager = null;
   var DOMAIN_NAME = 'eyeNav';
 
-  var start = function () {
-    eye.activate({
+  var start = function() {
+    eyeTribe.activate({
       host: 'localhost',
       port: 6555,
       mode: 'push',
@@ -15,11 +15,20 @@
     });
   };
 
-  var stop = function () {
-    eye.deactivate(function () {});
+  var stop = function() {
+    eyeTribe.deactivate(function() {});
   };
 
-  eye.on('gazeUpdate', function (gazeData, err) {
+  //Usually when both values are zero it is because the tracker failed to locate the gaze.
+  var isValidGaze = function(gazeData) {
+    if (gazeData.x === 0 && gazeData.y === 0) {
+      return false;
+    }
+
+    return true;
+  };
+
+  eyeTribe.on('gazeUpdate', function(gazeData, err) {
     //Note: This is the gaze format used throughout eyeNav. It can be extended as needed by the requirements.
     var eyeNavGazeFormattedData = {
       x: gazeData.avg.x,
@@ -30,17 +39,19 @@
       },
       timestamp: gazeData.timestamp
     };
-    
-    _domainManager.emitEvent(DOMAIN_NAME, 'gazeChanged', eyeNavGazeFormattedData);
+
+    if (isValidGaze(eyeNavGazeFormattedData)) {
+      _domainManager.emitEvent(DOMAIN_NAME, 'gazeChanged', eyeNavGazeFormattedData);
+    }
   });
 
   //Future: Use the connected and disconnected to manage connections properly.
-  eye.on('connected', function () {
+  eyeTribe.on('connected', function() {
     // connected to tracker server
     _domainManager.emitEvent(DOMAIN_NAME, 'trackerConnected');
   });
 
-  eye.on('disconnected', function (err) {
+  eyeTribe.on('disconnected', function(err) {
     // err not null if disconnected because of an error.
     _domainManager.emitEvent(DOMAIN_NAME, 'trackerDisconnected', err);
   });

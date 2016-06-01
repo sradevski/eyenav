@@ -188,7 +188,7 @@ define(function (require, exports, module) {
   var selectHoveredWord = function () {
     var curEditor = EditorManager.getCurrentFullEditor();
     var currentCursor = curEditor.getCursorPos();
-    var token = editorVariableManager.getToken(currentCursor);
+    var token = editorVariableManager.getTokenAtPos(currentCursor);
 
     curEditor.setSelection({
       line: currentCursor.line,

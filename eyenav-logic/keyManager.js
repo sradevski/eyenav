@@ -3,31 +3,31 @@ define(function (require, exports, module) {
   'use strict';
 
   //Future: Manage function assignment in a way that will require for less dependencies.
+
+  //Future: Extension of modifier keys (such as text selection) is very difficult with the current implementation, so it should be done in a more extensible way.
   var keys = {
     commandToggle: {
       keyCode: 18,
       location: 2,
       btnName: 'rightAlt',
       isPressed: false,
-      releaseAfterFunc : false,
-      func: function () {
-      }
+      releaseAfterFunc: false,
+      func: function () {}
     },
     textSelection: {
       keyCode: 16,
       location: 1,
       btnName: 'Left Shift',
       isPressed: false,
-      releaseAfterFunc : false,
-      func: function () {
-      }
+      releaseAfterFunc: false,
+      func: function () {}
     },
     freeMove: {
       keyCode: 76,
       location: 0,
       btnName: 'L',
       isPressed: false,
-      releaseAfterFunc : false,
+      releaseAfterFunc: false,
       func: require('./movements').cursorClick
     },
     click: {
@@ -35,8 +35,7 @@ define(function (require, exports, module) {
       location: 0,
       btnName: 'Q',
       isPressed: false,
-      releaseAfterFunc : true,
-      //Future: This is not very clean, refactor it.
+      releaseAfterFunc: true,
       func: require('./movements').cursorClick
     },
     verticalScroll: {
@@ -44,7 +43,7 @@ define(function (require, exports, module) {
       location: 0,
       btnName: 'Z',
       isPressed: false,
-      releaseAfterFunc : false,
+      releaseAfterFunc: false,
       func: require('./movements').verticalScroll
     },
     verticalCursorScroll: {
@@ -52,7 +51,7 @@ define(function (require, exports, module) {
       location: 0,
       btnName: 'F',
       isPressed: false,
-      releaseAfterFunc : false,
+      releaseAfterFunc: false,
       func: require('./movements').verticalCursorScroll
     },
     horizontalCursorScroll: {
@@ -60,7 +59,7 @@ define(function (require, exports, module) {
       location: 0,
       btnName: 'R',
       isPressed: false,
-      releaseAfterFunc : false,
+      releaseAfterFunc: false,
       func: require('./movements').horizontalCursorScroll
     },
     cursorUp: {
@@ -68,15 +67,15 @@ define(function (require, exports, module) {
       location: 0,
       btnName: 'W',
       isPressed: false,
-      releaseAfterFunc : true,
-      func:require('./movements').arrowKeysMovements('up')
+      releaseAfterFunc: true,
+      func: require('./movements').arrowKeysMovements('up')
     },
     cursorDown: {
       keyCode: 83,
       location: 0,
       btnName: 'S',
       isPressed: false,
-      releaseAfterFunc : true,
+      releaseAfterFunc: true,
       func: require('./movements').arrowKeysMovements('down')
     },
     cursorLeft: {
@@ -84,7 +83,7 @@ define(function (require, exports, module) {
       location: 0,
       btnName: 'A',
       isPressed: false,
-      releaseAfterFunc : true,
+      releaseAfterFunc: true,
       func: require('./movements').arrowKeysMovements('left')
     },
     cursorRight: {
@@ -92,7 +91,7 @@ define(function (require, exports, module) {
       location: 0,
       btnName: 'D',
       isPressed: false,
-      releaseAfterFunc : true,
+      releaseAfterFunc: true,
       func: require('./movements').arrowKeysMovements('right')
     },
     selectHoveredWord: {
@@ -100,7 +99,7 @@ define(function (require, exports, module) {
       location: 0,
       btnName: 'P',
       isPressed: false,
-      releaseAfterFunc : true,
+      releaseAfterFunc: true,
       func: require('./movements').selectHoveredWord
     },
     manualOffsetXPlus: {
@@ -108,7 +107,7 @@ define(function (require, exports, module) {
       location: 0,
       btnName: 'Right Arrow',
       isPressed: false,
-      releaseAfterFunc : true,
+      releaseAfterFunc: true,
       func: require('./movements').setManualOffset(1, 0)
     },
     manualOffsetXMinus: {
@@ -116,7 +115,7 @@ define(function (require, exports, module) {
       location: 0,
       btnName: 'Left Arrow',
       isPressed: false,
-      releaseAfterFunc : true,
+      releaseAfterFunc: true,
       func: require('./movements').setManualOffset(-1, 0)
     },
     manualOffsetYPlus: {
@@ -124,7 +123,7 @@ define(function (require, exports, module) {
       location: 0,
       btnName: 'Down Arrow',
       isPressed: false,
-      releaseAfterFunc : true,
+      releaseAfterFunc: true,
       func: require('./movements').setManualOffset(0, 1)
     },
     manualOffsetYMinus: {
@@ -132,11 +131,11 @@ define(function (require, exports, module) {
       location: 0,
       btnName: 'Up Arrow',
       isPressed: false,
-      releaseAfterFunc : true,
+      releaseAfterFunc: true,
       func: require('./movements').setManualOffset(0, -1)
     }
   };
-  
+
   var isKeyPressed = function (key) {
     return key.isPressed;
   };
@@ -150,11 +149,13 @@ define(function (require, exports, module) {
   var setKeyReleased = function (key) {
     if (key) {
       key.isPressed = false;
-      
+
       //Reset all other keys if the command key is released
-      if(key === keys.commandToggle){
-        for(var k in keys){
-          keys[k].isPressed = false;
+      if (key === keys.commandToggle) {
+        for (var k in keys) {
+          if (keys[k].hasOwnProperty("isPressed")) {
+            keys[k].isPressed = false;
+          }
         }
       }
     }
@@ -169,15 +170,14 @@ define(function (require, exports, module) {
     return undefined;
   };
 
-  var isValidKeyCommand = function(key){
-    if(key === keys.commandToggle || !keys.commandToggle.isPressed){
+  var isValidKeyCommand = function (key) {
+    if (key === keys.commandToggle || !keys.commandToggle.isPressed) {
       return false;
     }
 
     return isKeyPressed(key);
   };
 
-  //exports.populateWriterKeyDict = populateWriterKeyDict;
   exports.getKeyFromCodeAndLocation = getKeyFromCodeAndLocation;
   exports.isValidKeyCommand = isValidKeyCommand;
   exports.isKeyPressed = isKeyPressed;

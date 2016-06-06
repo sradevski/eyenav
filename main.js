@@ -4,7 +4,7 @@ define(function (require, exports, module) {
   var ExtensionUtils = brackets.getModule('utils/ExtensionUtils'),
     AppInit = brackets.getModule('utils/AppInit'),
     NodeDomain = brackets.getModule('utils/NodeDomain'),
-    init = require('eyenav-logic/init');
+    init = require('src/init');
 
   var DOMAIN_NAME = 'eyeNav';
 

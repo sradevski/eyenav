@@ -1,19 +1,12 @@
 {
-  "name": "eyeNav",
-  "private": true,
-  "version": "0.1.0",
-  "description": "Brackets Extension to Navigate Code with Eyetracking",
-  "keywords": [
-    "eye-tracking"
-  ],
-  "main": "main.js",
-  "author": {
-    "name": "Stevche Radevski",
-    "email": "sradevski@live.com"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://bitbucket.org/stevchesteam/eyenavigate"
-  },
-  "license": "MIT"
+  "name": "stevche.radevski.eyeNav",
+  "title": "EyeNav: Eye-Tracking IDE Navigator",
+  "description": "EyeNav is a tool that allows you to do simple navigation in the IDE using an eye-tracking device. It allows you to scroll, click, select text, and more using your eyes and keyboard shortcuts. Currently it supports only EyeTribe tracker, but adding other devices is relatively simple to do.",
+  "homepage": "https://github.com/sradevski/eyenav",
+  "version": "1.0.0",
+  "author": "Stevche Radevski (https://github.com/sradevski)",
+  "license": "MIT",
+  "engines": {
+    "brackets": ">=1.6.0"
+  }
 }

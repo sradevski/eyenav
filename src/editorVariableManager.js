@@ -11,6 +11,13 @@ define(function (require, exports, module) {
     }
     return false;
   };
+  
+  var getDisplaySize = function(){
+    return {
+      height: window.screen.height,
+      width: window.screen.width
+    };
+  };
 
   var getCurrentEditorSizeAndCoords = function () {
     var curEditor = EditorManager.getCurrentFullEditor();
@@ -65,14 +72,14 @@ define(function (require, exports, module) {
     //Future: Figure out where the 30 pixels come from (which variable)
     var scrollerHeight = curEditor._codeMirror.display.scroller.children[0].clientHeight - 30;
     
-    return ~~(scrollerHeight / charSize.height);
+    return Math.round(scrollerHeight / charSize.height);
   };
 
   var getNumOfVisibleLines = function () {
     var editorCoordInfo = getCurrentEditorSizeAndCoords();
     var charSize = getCharSize();
 
-    return ~~(editorCoordInfo.height / charSize.height);
+    return Math.round(editorCoordInfo.height / charSize.height);
   };
 
   var getScrolledLines = function () {
@@ -80,30 +87,11 @@ define(function (require, exports, module) {
     var scrollPos = curEditor.getScrollPos();
     var charSize = getCharSize();
     
-    return ~~(scrollPos.y / charSize.height);
+    return Math.round(scrollPos.y / charSize.height);
   };
 
-  var isGoalLineWithinBorders = function (goalLine) {
-    var numOfLines = getNumOfLines();
-    var scrolledLines = getScrolledLines();
-    var maxLinesInScreen = getNumOfVisibleLines();
-
-    if (goalLine >= scrolledLines && goalLine < (scrolledLines + maxLinesInScreen)) {
-      return true;
-    }
-
-    return false;
-  };
-
-  var getTokenAtPos = function (cursorPos) {
-    var curEditor = EditorManager.getCurrentFullEditor();
-
-    if (cursorPos) {
-      return TokenUtils.getTokenAt(curEditor._codeMirror, cursorPos, false);
-
-    } else {
-      return TokenUtils.getTokenAt(curEditor._codeMirror, curEditor.getCursorPos(), false);
-    }
+  var getTokenAtWrapper = function(curEditor, cursorPos){
+    return TokenUtils.getTokenAt(curEditor._codeMirror, cursorPos, false);
   };
 
   exports.isFullScreen = isFullScreen;
@@ -113,6 +101,6 @@ define(function (require, exports, module) {
   exports.getNumOfLines = getNumOfLines;
   exports.getNumOfVisibleLines = getNumOfVisibleLines;
   exports.getScrolledLines = getScrolledLines;
-  exports.isGoalLineWithinBorders = isGoalLineWithinBorders;
-  exports.getTokenAtPos = getTokenAtPos;
+  exports.getTokenAtWrapper = getTokenAtWrapper;
+  exports.getDisplaySize = getDisplaySize;
 });

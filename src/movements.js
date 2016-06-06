@@ -2,22 +2,13 @@ define(function (require, exports, module) {
   'use strict';
 
   var EditorManager = brackets.getModule('editor/EditorManager'),
-    EventDispatcher = brackets.getModule('utils/EventDispatcher'),
     editorVariableManager = require('./editorVariableManager'),
+    movementDataManager = require('./movementDataManager'),
     loggerForTest = require('./loggerForTest');
-
-  var SPEED_FACTOR = 80000;
-  var EPSYLON_PERCENTAGE = 10;
 
   var verticalScrollCharacterPos = null;
   var selectionStartPosition = null;
-  //Future: Save this to preferences (if I cant find a better way to adjust position)
-  var manualOffset = {
-    x: 0,
-    y: 0
-  };
-
-  //Future: Clean up this mess, should be done in a much better way.
+ 
   var makeCursorMovement = function (line, character, isSelection) {
     var curEditor = EditorManager.getCurrentFullEditor();
     var currentCursor = curEditor.getCursorPos();
@@ -41,73 +32,19 @@ define(function (require, exports, module) {
     }
   };
 
-  //It normalizes the xy coordinates having the top right corner of the editor as an origin.
-  var normalizeGazeDataXY = function (gazeData, editorCoordInfo) {
-    var normalizedData = {};
-    normalizedData.x = (gazeData.x + manualOffset.x) - editorCoordInfo.x;
-    normalizedData.y = (gazeData.y + manualOffset.y) - editorCoordInfo.y;
-    return normalizedData;
-  };
-
-  var calculateCursorOffset = function (gazeData, useCursor) {
-    var curEditor = EditorManager.getCurrentFullEditor();
-    var cursorCoords = {
-      x: 0,
-      y: 0
-    };
-    if (useCursor) {
-      cursorCoords = editorVariableManager.getCursorCoords();
-    }
-
-    var charSize = editorVariableManager.getCharSize();
-    var editorCoordInfo = editorVariableManager.getCurrentEditorSizeAndCoords();
-    var normalizedGazeData = normalizeGazeDataXY(gazeData, editorCoordInfo);
-    var scrolledLines = editorVariableManager.getScrolledLines();
-
-    var horizontalOffset = ~~((normalizedGazeData.x - cursorCoords.x) / charSize.width);
-    var verticalOffset = ~~((normalizedGazeData.y - cursorCoords.y) / charSize.height);
-
-    return {
-      horizontal: horizontalOffset,
-      vertical: verticalOffset + scrolledLines
-    };
-  };
-
-  var calculateYScrollVelocity = function (gazeData) {
-    var editorCoordInfo = editorVariableManager.getCurrentEditorSizeAndCoords();
-    var normalizedGazeData = normalizeGazeDataXY(gazeData, editorCoordInfo);
-    var velocityY = 0;
-
-    var midPoint = editorCoordInfo.height / 2;
-    var epsylon = (editorCoordInfo.height / 100) * EPSYLON_PERCENTAGE;
-    var direction = normalizedGazeData.y - midPoint > 0 ? 1 : -1;
-    var speedFactor = SPEED_FACTOR / editorCoordInfo.height;
-    //From 0 to 1 for half screen (height / 2 - epsylon)
-    var normalizedYLocation = (Math.abs(normalizedGazeData.y - midPoint) - epsylon) / (midPoint - epsylon);
-
-    //Check if the user is looking inside the editor window
-    if (normalizedGazeData.y > 0 || normalizedGazeData.y <= editorCoordInfo.height) {
-      //Check if the user is looking away from the center for some epsylon outset.
-      if (Math.abs(normalizedGazeData.y - midPoint) > epsylon) {
-        velocityY = Math.pow(normalizedYLocation, 2) * speedFactor * direction;
-      }
-    }
-
-    return velocityY;
-  };
-
   var cursorClick = function (gazeData, isSelection) {
-    var offset = calculateCursorOffset(gazeData, false);
+    var cursorGoal = movementDataManager.calculateCursorOffset(gazeData, false);
+    var adjustedCursor = movementDataManager.adjustCursorToValidLine(cursorGoal, gazeData);
 
-    if (editorVariableManager.isGoalLineWithinBorders(offset.vertical)) {
-      makeCursorMovement(offset.vertical, offset.horizontal, isSelection);
+    if (movementDataManager.isGoalLineWithinBorders(adjustedCursor.vertical)) {
+      makeCursorMovement(adjustedCursor.vertical, adjustedCursor.horizontal, isSelection);
     }
   };
 
   var verticalScroll = function (gazeData) {
     var curEditor = EditorManager.getCurrentFullEditor();
     var curScrollPos = curEditor.getScrollPos();
-    var velocity = calculateYScrollVelocity(gazeData);
+    var velocity = movementDataManager.calculateYScrollVelocity(gazeData);
 
     curEditor.setScrollPos(curScrollPos.x, curScrollPos.y + velocity);
   };
@@ -115,11 +52,11 @@ define(function (require, exports, module) {
   var verticalCursorScroll = function (gazeData, isSelection) {
     var curEditor = EditorManager.getCurrentFullEditor();
     var cursorPos = curEditor.getCursorPos();
-    var cursorOffset = calculateCursorOffset(gazeData, true);
+    var cursorOffset = movementDataManager.calculateCursorOffset(gazeData, true);
 
     var goalLinePos = cursorPos.line + cursorOffset.vertical;
 
-    if (editorVariableManager.isGoalLineWithinBorders(goalLinePos)) {
+    if (movementDataManager.isGoalLineWithinBorders(goalLinePos)) {
       makeCursorMovement(goalLinePos, verticalScrollCharacterPos, isSelection);
     }
   };
@@ -127,7 +64,7 @@ define(function (require, exports, module) {
   var horizontalCursorScroll = function (gazeData, isSelection) {
     var curEditor = EditorManager.getCurrentFullEditor();
     var cursorPos = curEditor.getCursorPos();
-    var cursorOffset = calculateCursorOffset(gazeData, true);
+    var cursorOffset = movementDataManager.calculateCursorOffset(gazeData, true);
 
     var goalCursorPos = cursorPos.ch + cursorOffset.horizontal;
     makeCursorMovement(cursorPos.line, goalCursorPos, isSelection);
@@ -171,11 +108,9 @@ define(function (require, exports, module) {
     var yOff = yOffset;
 
     return function (gazeData, isSelection) {
-      var charSize = editorVariableManager.getCharSize();
       var direction = "";
-      manualOffset.x += xOff * charSize.width;
-      manualOffset.y += yOff * charSize.height;
-
+      movementDataManager.adjustManualOffset(xOff, yOff);
+      
       if (xOff === -1) direction = "left";
       else if (xOff === 1) direction = "right";
       else if (yOff === -1) direction = "up";
@@ -188,7 +123,7 @@ define(function (require, exports, module) {
   var selectHoveredWord = function () {
     var curEditor = EditorManager.getCurrentFullEditor();
     var currentCursor = curEditor.getCursorPos();
-    var token = editorVariableManager.getTokenAtPos(currentCursor);
+    var token = movementDataManager.getTokenAtPos(currentCursor);
 
     curEditor.setSelection({
       line: currentCursor.line,
@@ -199,8 +134,7 @@ define(function (require, exports, module) {
     });
   };
 
-  //Future: Think of a more flexible implementation of this (including the checking of verticalCursorScroll)
-  //Future: Add logging of the action to be performed, the current cursor location, the gaze location, normalized gaze location, and the goal line. This can be used for research purposes. 
+  //Future: Do a more flexible implementation of this (including the checking of verticalCursorScroll)
   var executeMovement = function (actionToExecute, funcArguments) {
     var curEditor = EditorManager.getCurrentFullEditor();
     var cursorPos = curEditor.getCursorPos();

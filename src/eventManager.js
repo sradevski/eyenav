@@ -10,7 +10,7 @@ define(function (require, exports, module) {
 
   //This is the main loop of the program.
   var eyeTrackerHandler = function (info, gazeData) {
-    //Future: Refactor this so it complies with the other modifier functions. Think of a better way to manage the keys (having something like required each key adds an additional function if pressed or smth)
+    //Future: Refactor this so it is easily extensible with the other modifier functions. Think of a better way to manage the keys (having something like required each key adds an additional function if pressed or smth)
     for (var key in keys) {
       if (keyManager.isValidKeyCommand(keys[key])) {
         movements.executeMovement(keys[key].func, [gazeData, keys.textSelection.isPressed]);
@@ -24,7 +24,7 @@ define(function (require, exports, module) {
   var keyEventHandler = function (bracketsEvent, editor, event) {
     var key = keyManager.getKeyFromCodeAndLocation(event.keyCode, event.location);
     if (key) {
-      if (event.type === 'keydown') {
+      if (event.type === 'keydown') { 
         keyManager.setKeyPressed(key);
       } else if (event.type === 'keyup') {
         keyManager.setKeyReleased(key);

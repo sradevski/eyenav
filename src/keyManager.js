@@ -1,10 +1,6 @@
-//Future: Maybe change everywhere from working with a key object to working with the key ID
 define(function (require, exports, module) {
   'use strict';
 
-  //Future: Manage function assignment in a way that will require for less dependencies.
-
-  //Future: Extension of modifier keys (such as text selection) is very difficult with the current implementation, so it should be done in a more extensible way.
   var keys = {
     commandToggle: {
       keyCode: 18,
@@ -62,6 +58,14 @@ define(function (require, exports, module) {
       releaseAfterFunc: false,
       func: require('./movements').horizontalCursorScroll
     },
+    selectHoveredWord: {
+      keyCode: 80,
+      location: 0,
+      btnName: 'P',
+      isPressed: false,
+      releaseAfterFunc: true,
+      func: require('./movements').selectHoveredWord
+    },
     cursorUp: {
       keyCode: 87,
       location: 0,
@@ -93,14 +97,6 @@ define(function (require, exports, module) {
       isPressed: false,
       releaseAfterFunc: true,
       func: require('./movements').arrowKeysMovements('right')
-    },
-    selectHoveredWord: {
-      keyCode: 80,
-      location: 0,
-      btnName: 'P',
-      isPressed: false,
-      releaseAfterFunc: true,
-      func: require('./movements').selectHoveredWord
     },
     manualOffsetXPlus: {
       keyCode: 39,

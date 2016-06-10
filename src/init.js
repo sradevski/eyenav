@@ -16,7 +16,7 @@ define(function (require, exports, module) {
 
       prefs.set('enabled', toggleCommandChanged);
       command.setChecked(toggleCommandChanged);
-      eventManager.toggleEyeNav(toggleCommandChanged, eyeNavDomain);
+      eventManager.toggleEyeNav(toggleCommandChanged, eyeNavDomain, prefs.get('keys'));
     };
 
     var command = CommandManager.register('Enable EyeNav', MY_COMMAND_ID, menuToggle);
@@ -25,6 +25,7 @@ define(function (require, exports, module) {
     menu.addMenuDivider();
     menu.addMenuItem(MY_COMMAND_ID);
 
+    prefs.definePreference('keys', 'object', {});
     prefs.definePreference('enabled', 'boolean', true);
     command.setChecked(prefs.get('enabled'));
     eventManager.toggleEyeNav(prefs.get('enabled'), eyeNavDomain);

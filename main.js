@@ -9,7 +9,7 @@ define(function (require, exports, module) {
   var DOMAIN_NAME = 'eyeNav';
 
   //NodeDomain imports an external module, the one that connects the eyetracker sdk and the brackets extension in this case.
-  var eyeNavDomain = new NodeDomain(DOMAIN_NAME, ExtensionUtils.getModulePath(module, 'eyeTribeBridge.js'));
+  var eyeNavDomain = new NodeDomain(DOMAIN_NAME, ExtensionUtils.getModulePath(module, 'socketClient.js'));
 
   AppInit.appReady(function () {
     init(eyeNavDomain);

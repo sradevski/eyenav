@@ -3,8 +3,7 @@ define(function (require, exports, module) {
 
   var EditorManager = brackets.getModule('editor/EditorManager'),
     editorVariableManager = require('./editorVariableManager'),
-    movementDataManager = require('./movementDataManager'),
-    loggerForTest = require('./loggerForTest');
+    movementDataManager = require('./movementDataManager');
 
   var verticalScrollCharacterPos = null;
   var selectionStartPosition = null;

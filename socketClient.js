@@ -29,7 +29,6 @@
 
   var setSocketEventHandlers = function() {
     if (isSocketRunning()) {
-      //ToDo: Handle each event accordingly in the extension side.
       ws.on('open', function() {
         _domainManager.emitEvent(DOMAIN_NAME, 'trackerConnected');
         if (startTrackerAfterConnecting) {

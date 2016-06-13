@@ -8,7 +8,7 @@ define(function (require, exports, module) {
       case 'Linux':
         break;
       case 'Windows_NT':
-        exports.speedFactor = 40000;
+        exports.speedFactor = 30000;
         exports.allowAnyKeyLocationOnRelease = true;
         break;
     }  

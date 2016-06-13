@@ -189,6 +189,7 @@ define(function (require, exports, module) {
   };
 
   exports.getKeyFromCodeAndLocation = getKeyFromCodeAndLocation;
+  exports.getKeyFromCode = getKeyFromCode;
   exports.isValidKeyCommand = isValidKeyCommand;
   exports.isKeyPressed = isKeyPressed;
   exports.setKeyPressed = setKeyPressed;

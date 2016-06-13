@@ -56,11 +56,12 @@ define(function(require, exports, module) {
     }
   };
 
-  //ToDo: Handle the other events from the socketClient. Use widgets/Dialogs or widgets/StatusBar to show notifications
   var toggleEyeNav = function(toggle, socketClient, systemInfoProvider, userDefinedKeys) {
     var curEditor = EditorManager.getCurrentFullEditor();
     keyManager.setUserDefinedKeys(userDefinedKeys);
-    globals.adjustToOSType(systemInfoProvider.getOSType());
+    systemInfoProvider.exec('getOSType').done(function(osType){
+      globals.adjustToOSType(osType);
+    });
 
     if (toggle) {
       EditorManager.on('activeEditorChange', activeEditorChangeHandler);

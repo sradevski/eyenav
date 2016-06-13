@@ -5,11 +5,11 @@ ehthumbs.db
 Icon?
 Thumbs.db
 
-# Node and related ecosystem
+# Node and related ecosystem (for brackets.io, each module should be shipped together with the node_modules.)
 # ==========================
+#node_modules/
 .nodemonignore
 .sass-cache/
-node_modules/
 public/lib/
 app/tests/coverage/
 .bower-*/
@@ -72,3 +72,7 @@ mongod
 *.ntvs*
 *.njsproj
 *.sln
+
+# Brackets.io
+# =========
+.brackets.json

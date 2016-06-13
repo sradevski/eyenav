@@ -1,6 +1,6 @@
 define(function (require, exports, module) {
   'use strict';
-  module.exports = function (eyeNavDomain) {
+  module.exports = function (socketClient, systemInfoProvider) {
     var Menus = brackets.getModule('command/Menus'),
       CommandManager = brackets.getModule('command/CommandManager'),
       EditorManager = brackets.getModule('editor/EditorManager'),
@@ -16,7 +16,7 @@ define(function (require, exports, module) {
 
       prefs.set('enabled', toggleCommandChanged);
       command.setChecked(toggleCommandChanged);
-      eventManager.toggleEyeNav(toggleCommandChanged, eyeNavDomain, prefs.get('keys'));
+      eventManager.toggleEyeNav(toggleCommandChanged, socketClient, systemInfoProvider, prefs.get('keys'));
     };
 
     var command = CommandManager.register('Enable EyeNav', MY_COMMAND_ID, menuToggle);
@@ -26,8 +26,8 @@ define(function (require, exports, module) {
     menu.addMenuItem(MY_COMMAND_ID);
 
     prefs.definePreference('keys', 'object', {});
-    prefs.definePreference('enabled', 'boolean', true);
+    prefs.definePreference('enabled', 'boolean', false);
     command.setChecked(prefs.get('enabled'));
-    eventManager.toggleEyeNav(prefs.get('enabled'), eyeNavDomain);
+    eventManager.toggleEyeNav(prefs.get('enabled'), socketClient, systemInfoProvider, prefs.get('keys'));
   };
 });

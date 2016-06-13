@@ -1,15 +1,16 @@
-define(function (require, exports, module) {
+define(function(require, exports, module) {
   'use strict';
 
   var EditorManager = brackets.getModule('editor/EditorManager'),
     KeyEvent = brackets.getModule('utils/KeyEvent'),
+    globals = require('./globals'),
     keyManager = require('./keyManager'),
     movements = require('./movements');
 
   var keys = keyManager.keys;
 
   //This is the main loop of the program.
-  var eyeTrackerHandler = function (info, gazeData) {
+  var eyeTrackerHandler = function(info, gazeData) {
     //Future: Refactor this so it is easily extensible with the other modifier functions. Think of a better way to manage the keys (having something like required each key adds an additional function if pressed or smth). One approach is using "before:" "after:" events for each movement.
     for (var key in keys) {
       if (keyManager.isValidKeyCommand(keys[key])) {
@@ -21,10 +22,18 @@ define(function (require, exports, module) {
     }
   };
 
-  var keyEventHandler = function (bracketsEvent, editor, event) {
-    var key = keyManager.getKeyFromCodeAndLocation(event.keyCode, event.location);
+  var keyEventHandler = function(bracketsEvent, editor, event) {
+    var key;
+    
+    //This is used to handle a strange behavior on windows where a key's location is correct on keydown, but always 0 on keyup.
+    if (globals.allowAnyKeyLocationOnRelease) {
+      key = keyManager.getKeyFromCode(event.keyCode);
+    } else {
+      key = keyManager.getKeyFromCodeAndLocation(event.keyCode, event.location);
+    }
+    
     if (key) {
-      if (event.type === 'keydown') {
+      if (event.type === 'keydown' && key.location === event.location) {
         keyManager.setKeyPressed(key);
       } else if (event.type === 'keyup') {
         keyManager.setKeyReleased(key);
@@ -36,7 +45,7 @@ define(function (require, exports, module) {
     }
   };
 
-  var activeEditorChangeHandler = function ($event, focusedEditor, lostEditor) {
+  var activeEditorChangeHandler = function($event, focusedEditor, lostEditor) {
     if (lostEditor) {
       lostEditor.off('keyup', keyEventHandler)
         .off('keydown', keyEventHandler);
@@ -48,20 +57,21 @@ define(function (require, exports, module) {
   };
 
   //ToDo: Handle the other events from the socketClient. Use widgets/Dialogs or widgets/StatusBar to show notifications
-  var toggleEyeNav = function (toggle, domain, userDefinedKeys) {
+  var toggleEyeNav = function(toggle, socketClient, systemInfoProvider, userDefinedKeys) {
     var curEditor = EditorManager.getCurrentFullEditor();
     keyManager.setUserDefinedKeys(userDefinedKeys);
-    
+    globals.adjustToOSType(systemInfoProvider.getOSType());
+
     if (toggle) {
       EditorManager.on('activeEditorChange', activeEditorChangeHandler);
-      domain.on('gazeChanged', eyeTrackerHandler);
-      domain.exec('start');
+      socketClient.on('gazeChanged', eyeTrackerHandler);
+      socketClient.exec('start');
       //This handles the case when brackets starts with an opened file (so no activeEditorChange event happens)
       activeEditorChangeHandler(null, curEditor, null);
     } else {
       EditorManager.off('activeEditorChange', activeEditorChangeHandler);
-      domain.off('gazeChanged', eyeTrackerHandler);
-      domain.exec('stop');
+      socketClient.off('gazeChanged', eyeTrackerHandler);
+      socketClient.exec('stop');
       activeEditorChangeHandler(null, null, curEditor);
     }
   };

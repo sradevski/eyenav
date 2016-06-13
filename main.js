@@ -6,12 +6,15 @@ define(function (require, exports, module) {
     NodeDomain = brackets.getModule('utils/NodeDomain'),
     init = require('src/init');
 
-  var DOMAIN_NAME = 'eyeNav';
+  var socketDomainName = 'socketDomain';
+  var systemInfoDomainName = 'systemInfoDomain';
 
   //NodeDomain imports an external module, the one that connects the eyetracker sdk and the brackets extension in this case.
-  var eyeNavDomain = new NodeDomain(DOMAIN_NAME, ExtensionUtils.getModulePath(module, 'socketClient.js'));
+  var socketClient = new NodeDomain(socketDomainName, ExtensionUtils.getModulePath(module, 'socketClient.js'));
+
+  var systemInfoProvider = new NodeDomain(systemInfoDomainName, ExtensionUtils.getModulePath(module, 'systemInfoProvider.js'));
 
   AppInit.appReady(function () {
-    init(eyeNavDomain);
+    init(socketClient, systemInfoProvider);
   });
 });

@@ -1,7 +1,6 @@
 define(function (require, exports, module) {
   'use strict';
   
-  //ToDo: The key bindings are weird on windows, the location changes on keydown and keyup. Fix this.
   var keys = {
     commandToggle: {
       keyCode: 18,
@@ -156,6 +155,15 @@ define(function (require, exports, module) {
         }
       }
     }
+  };
+
+  var getKeyFromCode = function (keyCode) {
+    for (var k in keys) {
+      if (keys[k].keyCode === keyCode)
+        return keys[k];
+    }
+
+    return undefined;
   };
 
   var getKeyFromCodeAndLocation = function (keyCode, keyLocation) {

@@ -1,24 +1,15 @@
 define(function (require, exports, module) {
   'use strict';
   var EditorManager = brackets.getModule('editor/EditorManager'),
-      editorVariableManager = require('./editorVariableManager');
+      editorVariableManager = require('./editorVariableManager'),
+      globals = require('./globals');
 
-  var DISTANCE_FROM_SCREEN_MM = 700;
-  var SCREEN_INCHES = 21.5;
-  //ToDo: Scrolling speed on windows is different, so test it out and use different values for windows.
-  var SPEED_FACTOR = 80000;
-  var EPSYLON_PERCENTAGE = 10;
-
-  var manualOffset = {
-    x: 0,
-    y: 0
-  };
-  
+ 
   //This calculates the theoretical average error for most eye trackers, which is 1 degree angle.
   var getAverageGazeErrorInPixels = function () {
     var screenSize = editorVariableManager.getDisplaySize();
-    var errorInMm = DISTANCE_FROM_SCREEN_MM * Math.tan(0.5 * Math.PI / 180);
-    var ppi = Math.sqrt(Math.pow(screenSize.height, 2) + Math.pow(screenSize.width, 2)) / SCREEN_INCHES;
+    var errorInMm = globals.distanceFromScreenMm * Math.tan(0.5 * Math.PI / 180);
+    var ppi = Math.sqrt(Math.pow(screenSize.height, 2) + Math.pow(screenSize.width, 2)) / globals.screenInches;
     var dotPitch = 25.4 / ppi;
 
     return Math.round(errorInMm / dotPitch);
@@ -27,8 +18,8 @@ define(function (require, exports, module) {
   //It normalizes the xy coordinates having the top right corner of the editor as an origin.
   var normalizeGazeDataXY = function (gazeData, editorCoordInfo) {
     var normalizedData = {};
-    normalizedData.x = (gazeData.x + manualOffset.x) - editorCoordInfo.x;
-    normalizedData.y = (gazeData.y + manualOffset.y) - editorCoordInfo.y;
+    normalizedData.x = (gazeData.x + globals.manualOffset.x) - editorCoordInfo.x;
+    normalizedData.y = (gazeData.y + globals.manualOffset.y) - editorCoordInfo.y;
     return normalizedData;
   };
   
@@ -87,9 +78,9 @@ define(function (require, exports, module) {
     var velocityY = 0;
 
     var midPoint = editorCoordInfo.height / 2;
-    var epsylon = (editorCoordInfo.height / 100) * EPSYLON_PERCENTAGE;
+    var epsylon = (editorCoordInfo.height / 100) * globals.epsylonPercentage;
     var direction = normalizedGazeData.y - midPoint > 0 ? 1 : -1;
-    var speedFactor = SPEED_FACTOR / editorCoordInfo.height;
+    var speedFactor = globals.speedFactor / editorCoordInfo.height;
     //From 0 to 1 for half screen (height / 2 - epsylon)
     var normalizedYLocation = (Math.abs(normalizedGazeData.y - midPoint) - epsylon) / (midPoint - epsylon);
 
@@ -106,8 +97,8 @@ define(function (require, exports, module) {
   
   var adjustManualOffset = function(xOffset, yOffset){
     var charSize = editorVariableManager.getCharSize();
-    manualOffset.x += xOffset * charSize.width;
-    manualOffset.y += yOffset * charSize.height;
+    globals.manualOffset.x += xOffset * charSize.width;
+    globals.manualOffset.y += yOffset * charSize.height;
   };
   
   var isGoalLineWithinBorders = function (goalLine) {

@@ -5,6 +5,7 @@ define(function (require, exports, module) {
 
   var DISTANCE_FROM_SCREEN_MM = 700;
   var SCREEN_INCHES = 21.5;
+  //ToDo: Scrolling speed on windows is different, so test it out and use different values for windows.
   var SPEED_FACTOR = 80000;
   var EPSYLON_PERCENTAGE = 10;
 

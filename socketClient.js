@@ -12,14 +12,14 @@
 
   
   //Note: Current commands that the server understands are "startTracker" and "stopTracker". This should be extended accordingly to the needs.
-  //Note: Each Gaze entry should come with a state field denoting the state of the gaze. I am using the states from EyeTribe as a basis, and each server should implement the same states. TrackingGaze: 1, TrackingEyes: 2, TrackingPresence: 4, TrackingFail: 8, TrackingLost: 16
+  //Note: Each Gaze entry should come with a state field denoting the state of the gaze. I am using the states from EyeTribe as a basis, and each server should implement the same states. Tracking Gaze: 1, Not Tracking: 2, Everything else: 10
   
   var isValidGazeData = function (gazeData) {
-    if (gazeData.state === 8 || gazeData.state === 16) {
-      return false;
+    if (gazeData.state === 1) {
+      return true;                                                                                                                                                                                                                                          
     }
 
-    return true;
+    return false;
   };
 
   var isSocketRunning = function () {

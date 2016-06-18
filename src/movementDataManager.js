@@ -95,7 +95,7 @@ define(function (require, exports, module) {
     return velocityY;
   };
   
-  var adjustManualOffset = function(xOffset, yOffset){
+  var adjustManualOffset = function(yOffset, xOffset){
     var charSize = editorVariableManager.getCharSize();
     globals.manualOffset.x += xOffset * charSize.width;
     globals.manualOffset.y += yOffset * charSize.height;

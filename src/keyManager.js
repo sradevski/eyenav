@@ -1,26 +1,54 @@
 define(function (require, exports, module) {
   'use strict';
   
-  var keys = {
+  //Helper function that merges two or more objects into one.
+  function collect() {
+    var ret = {};
+    var len = arguments.length;
+    for (var i=0; i<len; i++) {
+      for (var p in arguments[i]) {
+        if (arguments[i].hasOwnProperty(p)) {
+          ret[p] = arguments[i][p];
+        }
+      }
+    }
+    return ret;
+  }
+  
+  var triggerKeys = {
     commandToggle: {
       keyCode: 18,
-      location: 2,
+      location: [2],
       btnName: 'rightAlt',
       isPressed: false,
       releaseAfterFunc: false,
       func: function () {}
-    },
+    }
+  };
+  
+  var modifierKeys = {
     textSelection: {
       keyCode: 16,
-      location: 1,
-      btnName: 'Left Shift',
+      location: [1],
+      btnName: 'leftShift',
       isPressed: false,
       releaseAfterFunc: false,
       func: function () {}
     },
+    gazeManualOffset: {
+      keyCode: 190,
+      location: [0],
+      btnName: 'fullStop',
+      isPressed: false,
+      releaseAfterFunc: false,
+      func: function () {}
+    },
+  };
+  
+  var functionKeys = {
     freeMove: {
       keyCode: 76,
-      location: 0,
+      location: [0],
       btnName: 'L',
       isPressed: false,
       releaseAfterFunc: false,
@@ -28,7 +56,7 @@ define(function (require, exports, module) {
     },
     click: {
       keyCode: 81,
-      location: 0,
+      location: [0],
       btnName: 'Q',
       isPressed: false,
       releaseAfterFunc: true,
@@ -36,7 +64,7 @@ define(function (require, exports, module) {
     },
     verticalScroll: {
       keyCode: 90,
-      location: 0,
+      location: [0],
       btnName: 'Z',
       isPressed: false,
       releaseAfterFunc: false,
@@ -44,7 +72,7 @@ define(function (require, exports, module) {
     },
     verticalCursorScroll: {
       keyCode: 70,
-      location: 0,
+      location: [0],
       btnName: 'F',
       isPressed: false,
       releaseAfterFunc: false,
@@ -52,7 +80,7 @@ define(function (require, exports, module) {
     },
     horizontalCursorScroll: {
       keyCode: 82,
-      location: 0,
+      location: [0],
       btnName: 'R',
       isPressed: false,
       releaseAfterFunc: false,
@@ -60,7 +88,7 @@ define(function (require, exports, module) {
     },
     selectHoveredWord: {
       keyCode: 80,
-      location: 0,
+      location: [0],
       btnName: 'P',
       isPressed: false,
       releaseAfterFunc: true,
@@ -68,7 +96,7 @@ define(function (require, exports, module) {
     },
     cursorUp: {
       keyCode: 87,
-      location: 0,
+      location: [0],
       btnName: 'W',
       isPressed: false,
       releaseAfterFunc: true,
@@ -76,7 +104,7 @@ define(function (require, exports, module) {
     },
     cursorDown: {
       keyCode: 83,
-      location: 0,
+      location: [0],
       btnName: 'S',
       isPressed: false,
       releaseAfterFunc: true,
@@ -84,7 +112,7 @@ define(function (require, exports, module) {
     },
     cursorLeft: {
       keyCode: 65,
-      location: 0,
+      location: [0],
       btnName: 'A',
       isPressed: false,
       releaseAfterFunc: true,
@@ -92,46 +120,16 @@ define(function (require, exports, module) {
     },
     cursorRight: {
       keyCode: 68,
-      location: 0,
+      location: [0],
       btnName: 'D',
       isPressed: false,
       releaseAfterFunc: true,
       func: require('./movements').arrowKeysMovements('right')
-    },
-    manualOffsetXPlus: {
-      keyCode: 39,
-      location: 0,
-      btnName: 'Right Arrow',
-      isPressed: false,
-      releaseAfterFunc: true,
-      func: require('./movements').setManualOffset(1, 0)
-    },
-    manualOffsetXMinus: {
-      keyCode: 37,
-      location: 0,
-      btnName: 'Left Arrow',
-      isPressed: false,
-      releaseAfterFunc: true,
-      func: require('./movements').setManualOffset(-1, 0)
-    },
-    manualOffsetYPlus: {
-      keyCode: 40,
-      location: 0,
-      btnName: 'Down Arrow',
-      isPressed: false,
-      releaseAfterFunc: true,
-      func: require('./movements').setManualOffset(0, 1)
-    },
-    manualOffsetYMinus: {
-      keyCode: 38,
-      location: 0,
-      btnName: 'Up Arrow',
-      isPressed: false,
-      releaseAfterFunc: true,
-      func: require('./movements').setManualOffset(0, -1)
     }
   };
 
+  var keys = collect(triggerKeys, modifierKeys, functionKeys);
+  
   var isKeyPressed = function (key) {
     return key.isPressed;
   };
@@ -168,7 +166,7 @@ define(function (require, exports, module) {
 
   var getKeyFromCodeAndLocation = function (keyCode, keyLocation) {
     for (var k in keys) {
-      if (keys[k].keyCode === keyCode && keys[k].location === keyLocation)
+      if (keys[k].keyCode === keyCode && keys[k].location.indexOf(keyLocation) !== -1)
         return keys[k];
     }
 

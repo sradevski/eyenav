@@ -8,7 +8,7 @@ define(function (require, exports, module) {
       case 'Linux':
         break;
       case 'Windows_NT':
-        exports.speedFactor = 30000;
+        exports.speedFactor = exports.speedFactor / 3;
         exports.allowAnyKeyLocationOnRelease = true;
         break;
     }  
@@ -18,6 +18,8 @@ define(function (require, exports, module) {
 
   exports.allowAnyKeyLocationOnRelease = false;
   exports.distanceFromScreenMm = 700;
+  exports.port = 8887;
+  exports.ipAddress = "127.0.0.1";
   exports.screenInches = 21.5;
   exports.speedFactor = 80000;
   exports.epsylonPercentage = 10;

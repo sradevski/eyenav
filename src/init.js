@@ -6,6 +6,7 @@ define(function (require, exports, module) {
       EditorManager = brackets.getModule('editor/EditorManager'),
       PreferencesManager = brackets.getModule('preferences/PreferencesManager'),
       eventManager = require('./eventManager'),
+      globals = require('./globals'),
       prefs = PreferencesManager.getExtensionPrefs('eyeNav');
 
     var MY_COMMAND_ID = 'stevche.radevski.eyeNav';
@@ -27,7 +28,12 @@ define(function (require, exports, module) {
 
     prefs.definePreference('keys', 'object', {});
     prefs.definePreference('enabled', 'boolean', false);
+    prefs.definePreference('port', 'number', globals.port);
+    prefs.definePreference('ipAddress', 'string', globals.ipAddress);
+    
     command.setChecked(prefs.get('enabled'));
+    globals.port = prefs.get('port');
+    globals.ipAddress = prefs.get('ipAddress');
     eventManager.toggleEyeNav(prefs.get('enabled'), socketClient, systemInfoProvider, prefs.get('keys'));
   };
 });

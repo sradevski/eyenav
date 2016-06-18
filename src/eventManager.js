@@ -14,7 +14,7 @@ define(function(require, exports, module) {
     //Future: Refactor this so it is easily extensible with the other modifier functions. Think of a better way to manage the keys (having something like required each key adds an additional function if pressed or smth). One approach is using "before:" "after:" events for each movement.
     for (var key in keys) {
       if (keyManager.isValidKeyCommand(keys[key])) {
-        movements.executeMovement(keys[key].func, [gazeData, keys.textSelection.isPressed]);
+        movements.executeMovement(keys[key].func, [gazeData, keys.textSelection.isPressed, keys.gazeManualOffset.isPressed]);
         if (keys[key].releaseAfterFunc) {
           keyManager.setKeyReleased(keys[key]);
         }
@@ -22,9 +22,9 @@ define(function(require, exports, module) {
     }
   };
 
+  //Future: Tell users in the status bar whether the eye tracking is tracking the gaze (sending data) when they press any command.
   var keyEventHandler = function(bracketsEvent, editor, event) {
     var key;
-    
     //This is used to handle a strange behavior on windows where a key's location is correct on keydown, but always 0 on keyup.
     if (globals.allowAnyKeyLocationOnRelease) {
       key = keyManager.getKeyFromCode(event.keyCode);
@@ -33,13 +33,13 @@ define(function(require, exports, module) {
     }
     
     if (key) {
-      if (event.type === 'keydown' && key.location === event.location) {
+      if (event.type === 'keydown' && key.location.indexOf(event.location) !== -1) {
         keyManager.setKeyPressed(key);
       } else if (event.type === 'keyup') {
         keyManager.setKeyReleased(key);
       }
 
-      if (keyManager.isValidKeyCommand(key) || keyManager.keys.commandToggle === key) {
+      if (keys.commandToggle.isPressed || key === keys.commandToggle) {
         event.preventDefault();
       }
     }
@@ -66,7 +66,7 @@ define(function(require, exports, module) {
     if (toggle) {
       EditorManager.on('activeEditorChange', activeEditorChangeHandler);
       socketClient.on('gazeChanged', eyeTrackerHandler);
-      socketClient.exec('start');
+      socketClient.exec('start', globals.port, globals.ipAddress);
       //This handles the case when brackets starts with an opened file (so no activeEditorChange event happens)
       activeEditorChangeHandler(null, curEditor, null);
     } else {

@@ -7,7 +7,7 @@ define(function (require, exports, module) {
 
   var verticalScrollCharacterPos = null;
   var selectionStartPosition = null;
- 
+
   var makeCursorMovement = function (line, character, isSelection) {
     var curEditor = EditorManager.getCurrentFullEditor();
     var currentCursor = curEditor.getCursorPos();
@@ -72,13 +72,13 @@ define(function (require, exports, module) {
   var arrowKeysMovements = function (direction) {
     var passedDirection = direction;
 
-    return function (gazeData, isSelection) {
+    return function (gazeData, isSelection, isGazeOffset) {
       var curEditor = EditorManager.getCurrentFullEditor();
       var cursorPos = curEditor.getCursorPos();
 
       var goalCursorPos = {
-        ch: cursorPos.ch,
-        line: cursorPos.line
+        line: cursorPos.line,
+        ch: cursorPos.ch
       };
 
       switch (passedDirection) {
@@ -98,24 +98,11 @@ define(function (require, exports, module) {
         break;
       }
 
-      makeCursorMovement(goalCursorPos.line, goalCursorPos.ch, isSelection);
-    };
-  };
-
-  var setManualOffset = function (xOffset, yOffset) {
-    var xOff = xOffset;
-    var yOff = yOffset;
-
-    return function (gazeData, isSelection) {
-      var direction = "";
-      movementDataManager.adjustManualOffset(xOff, yOff);
+      if (isGazeOffset) {
+        movementDataManager.adjustManualOffset(goalCursorPos.line - cursorPos.line, goalCursorPos.ch - cursorPos.ch);
+      }
       
-      if (xOff === -1) direction = "left";
-      else if (xOff === 1) direction = "right";
-      else if (yOff === -1) direction = "up";
-      else if (yOff === 1) direction = "down";
-
-      arrowKeysMovements(direction)(gazeData, isSelection);
+      makeCursorMovement(goalCursorPos.line, goalCursorPos.ch, isSelection);
     };
   };
 
@@ -154,6 +141,5 @@ define(function (require, exports, module) {
   exports.verticalScroll = verticalScroll;
   exports.executeMovement = executeMovement;
   exports.arrowKeysMovements = arrowKeysMovements;
-  exports.setManualOffset = setManualOffset;
   exports.selectHoveredWord = selectHoveredWord;
 });

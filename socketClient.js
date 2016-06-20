@@ -10,22 +10,21 @@
     startTrackerAfterConnecting = false;
 
 
-  //Note: Current commands that the server understands are "startTracker" and "stopTracker". This should be extended accordingly to the needs.
   //Note: Each Gaze entry should come with a state field denoting the state of the gaze. I am using the states from EyeTribe as a basis, and each server should implement the same states. Tracking Gaze: 1, Not Tracking: 2, Everything else: 10
 
-  var isValidGazeData = function (gazeData) {
+  function isValidGazeData (gazeData) {
     if (gazeData.state === 1) {
       return true;
     }
 
     return false;
-  };
+  }
 
-  var isSocketRunning = function () {
+  function isSocketRunning () {
     return ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING);
-  };
+  }
 
-  var setSocketEventHandlers = function () {
+  function setSocketEventHandlers () {
     if (isSocketRunning()) {
       ws.on('open', function () {
         _domainManager.emitEvent(DOMAIN_NAME, 'trackerConnected');
@@ -54,30 +53,30 @@
         error: 'Socket is not open. Please make sure that the server is running.'
       });
     }
-  };
+  }
 
-  var startServer = function (port, ipAddress) {
+  function startServer (port, ipAddress) {
     if (!ws || (ws.readyState !== WebSocket.CONNECTING && ws.readyState !== WebSocket.OPEN)) {
       ws = new WebSocket('ws://' + ipAddress + ':' + port);
       setSocketEventHandlers();
     }
-  };
+  }
 
-  var start = function (port, ipAddress) {
+  function start (port, ipAddress) {
     if (!isSocketRunning()) {
       startServer(port, ipAddress);
       startTrackerAfterConnecting = true;
     } else {
       ws.send('startTracker');
     }
-  };
+  }
 
-  var stop = function () {
+  function stop () {
     if (isSocketRunning()) {
       ws.send('stopTracker');
       ws.close(1000, "Done tracking. Bye bye");
     }
-  };
+  }
 
   //This is how you export a module to be consumed in a brackets plugin
   function init(domainManager) {

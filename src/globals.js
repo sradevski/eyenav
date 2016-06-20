@@ -1,7 +1,7 @@
 define(function (require, exports, module) {
   'use strict';
   
-  var adjustToOSType = function(osType){
+  function adjustToOSType(osType){
     switch(osType){
       case 'Darwin':
         break;
@@ -12,7 +12,7 @@ define(function (require, exports, module) {
         exports.allowAnyKeyLocationOnRelease = true;
         break;
     }  
-  };
+  }
 
   exports.adjustToOSType = adjustToOSType;
 

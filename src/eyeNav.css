@@ -1,0 +1,11 @@
+.eyenav-svg {
+  background-image: url('img/eyenav.svg');
+}
+
+.eyenav-svg.active {
+  background-position: 0 -24px;
+}
+
+.eyenav-svg.nodata{
+  background-position: 0 -48px;
+}

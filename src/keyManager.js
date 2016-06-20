@@ -134,13 +134,13 @@ define(function (require, exports, module) {
     return key.isPressed;
   };
 
-  var setKeyPressed = function (key) {
+  function setKeyPressed (key) {
     if (key) {
       key.isPressed = true;
     }
-  };
+  }
 
-  var setKeyReleased = function (key) {
+  function setKeyReleased (key) {
     if (key) {
       key.isPressed = false;
 
@@ -153,38 +153,38 @@ define(function (require, exports, module) {
         }
       }
     }
-  };
+  }
 
-  var getKeyFromCode = function (keyCode) {
+  function getKeyFromCode (keyCode) {
     for (var k in keys) {
       if (keys[k].keyCode === keyCode)
         return keys[k];
     }
 
     return undefined;
-  };
+  }
 
-  var getKeyFromCodeAndLocation = function (keyCode, keyLocation) {
+  function getKeyFromCodeAndLocation (keyCode, keyLocation) {
     for (var k in keys) {
       if (keys[k].keyCode === keyCode && keys[k].location.indexOf(keyLocation) !== -1)
         return keys[k];
     }
 
     return undefined;
-  };
+  }
 
-  var isValidKeyCommand = function (key) {
+  function isValidKeyCommand (key) {
     if (key === keys.commandToggle || !keys.commandToggle.isPressed) {
       return false;
     }
 
     return isKeyPressed(key);
-  };
+  }
 
 
-  var setUserDefinedKeys = function (userDefinedKeys) {
-    //Merge the user-provided keys and the default keys. This maybe should be done in a different location, such as the init file.
-  };
+  function setUserDefinedKeys (userDefinedKeys) {
+    //ToDo: Merge the user-provided keys and the default keys. This maybe should be done in a different location, such as the init file.
+  }
 
   exports.getKeyFromCodeAndLocation = getKeyFromCodeAndLocation;
   exports.getKeyFromCode = getKeyFromCode;

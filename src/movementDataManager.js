@@ -6,24 +6,24 @@ define(function (require, exports, module) {
 
  
   //This calculates the theoretical average error for most eye trackers, which is 1 degree angle.
-  var getAverageGazeErrorInPixels = function () {
+  function getAverageGazeErrorInPixels () {
     var screenSize = editorVariableManager.getDisplaySize();
     var errorInMm = globals.distanceFromScreenMm * Math.tan(0.5 * Math.PI / 180);
     var ppi = Math.sqrt(Math.pow(screenSize.height, 2) + Math.pow(screenSize.width, 2)) / globals.screenInches;
     var dotPitch = 25.4 / ppi;
 
     return Math.round(errorInMm / dotPitch);
-  };
+  }
   
   //It normalizes the xy coordinates having the top right corner of the editor as an origin.
-  var normalizeGazeDataXY = function (gazeData, editorCoordInfo) {
+  function normalizeGazeDataXY (gazeData, editorCoordInfo) {
     var normalizedData = {};
     normalizedData.x = (gazeData.x + globals.manualOffset.x) - editorCoordInfo.x;
     normalizedData.y = (gazeData.y + globals.manualOffset.y) - editorCoordInfo.y;
     return normalizedData;
-  };
+  }
   
-  var calculateCursorOffset = function (gazeData, useCursor) {
+  function calculateCursorOffset (gazeData, useCursor) {
     var curEditor = EditorManager.getCurrentFullEditor();
     var cursorCoords = {
       x: 0,
@@ -44,9 +44,9 @@ define(function (require, exports, module) {
       horizontal: horizontalOffset,
       vertical: verticalOffset + scrolledLines
     };
-  };
+  }
 
-  var adjustCursorToValidLine = function (cursorGoal, gazeData) {
+  function adjustCursorToValidLine (cursorGoal, gazeData) {
     var curEditor = EditorManager.getCurrentFullEditor();
     var normalizedGazeData = normalizeGazeDataXY(gazeData, editorVariableManager.getCurrentEditorSizeAndCoords());
     var charSize = editorVariableManager.getCharSize();
@@ -70,9 +70,9 @@ define(function (require, exports, module) {
       horizontal: cursorGoal.horizontal,
       vertical: goalLine
     };
-  };
+  }
   
-  var calculateYScrollVelocity = function (gazeData) {
+  function calculateYScrollVelocity (gazeData) {
     var editorCoordInfo = editorVariableManager.getCurrentEditorSizeAndCoords();
     var normalizedGazeData = normalizeGazeDataXY(gazeData, editorCoordInfo);
     var velocityY = 0;
@@ -93,15 +93,15 @@ define(function (require, exports, module) {
     }
 
     return velocityY;
-  };
+  }
   
-  var adjustManualOffset = function(yOffset, xOffset){
+  function adjustManualOffset(yOffset, xOffset){
     var charSize = editorVariableManager.getCharSize();
     globals.manualOffset.x += xOffset * charSize.width;
     globals.manualOffset.y += yOffset * charSize.height;
-  };
+  }
   
-  var isGoalLineWithinBorders = function (goalLine) {
+  function isGoalLineWithinBorders (goalLine) {
     var numOfLines = editorVariableManager.getNumOfLines();
     var scrolledLines = editorVariableManager.getScrolledLines();
     var maxLinesInScreen = editorVariableManager.getNumOfVisibleLines();
@@ -111,9 +111,9 @@ define(function (require, exports, module) {
     }
 
     return false;
-  };
+  }
   
-  var getTokenAtPos = function (cursorPos) {
+  function getTokenAtPos (cursorPos) {
     var curEditor = EditorManager.getCurrentFullEditor();
     if (cursorPos) {
       return editorVariableManager.getTokenAtWrapper(curEditor, cursorPos);
@@ -121,7 +121,7 @@ define(function (require, exports, module) {
     } else {
       return editorVariableManager.getTokenAtWrapper(curEditor, curEditor.getCursorPos());
     }
-  };  
+  }
   
   exports.adjustCursorToValidLine = adjustCursorToValidLine;
   exports.normalizeGazeDataXY = normalizeGazeDataXY;

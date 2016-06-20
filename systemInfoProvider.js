@@ -5,9 +5,9 @@
     DOMAIN_NAME = 'systemInfoDomain',
     _domainManager = null;
 
-  var getOSType = function() {
+  function getOSType() {
     return os.type();
-  };
+  }
 
   //This is how you export a module to be consumed in a brackets plugin
   function init(domainManager) {

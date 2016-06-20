@@ -5,35 +5,61 @@ define(function (require, exports, module) {
       CommandManager = brackets.getModule('command/CommandManager'),
       EditorManager = brackets.getModule('editor/EditorManager'),
       PreferencesManager = brackets.getModule('preferences/PreferencesManager'),
+      ExtensionUtils = brackets.getModule('utils/ExtensionUtils'),
+
+      keyManager = require('./keyManager'),
       eventManager = require('./eventManager'),
       globals = require('./globals'),
-      prefs = PreferencesManager.getExtensionPrefs('eyeNav');
+      prefs = PreferencesManager.getExtensionPrefs('eyeNav'),
+      commandId = 'stevche.radevski.eyeNav';
 
-    var MY_COMMAND_ID = 'stevche.radevski.eyeNav';
+    var command = CommandManager.register('Enable EyeNav', commandId, menuToggle),
+      $todoIcon = $('<a href="#" title="EyeNav" class="eyenav-svg"></a>').click(function () {
+        menuToggle();
+      }).appendTo('#main-toolbar .buttons');
 
-    var menuToggle = function () {
-      var command = CommandManager.get(MY_COMMAND_ID);
-      var toggleCommandChanged = !command.getChecked();
-
-      prefs.set('enabled', toggleCommandChanged);
-      command.setChecked(toggleCommandChanged);
-      eventManager.toggleEyeNav(toggleCommandChanged, socketClient, systemInfoProvider, prefs.get('keys'));
-    };
-
-    var command = CommandManager.register('Enable EyeNav', MY_COMMAND_ID, menuToggle);
-
-    var menu = Menus.getMenu(Menus.AppMenuBar.FILE_MENU);
-    menu.addMenuDivider();
-    menu.addMenuItem(MY_COMMAND_ID);
-
+    ExtensionUtils.loadStyleSheet(module, './eyeNav.css');
     prefs.definePreference('keys', 'object', {});
     prefs.definePreference('enabled', 'boolean', false);
     prefs.definePreference('port', 'number', globals.port);
     prefs.definePreference('ipAddress', 'string', globals.ipAddress);
-    
+
     command.setChecked(prefs.get('enabled'));
     globals.port = prefs.get('port');
     globals.ipAddress = prefs.get('ipAddress');
-    eventManager.toggleEyeNav(prefs.get('enabled'), socketClient, systemInfoProvider, prefs.get('keys'));
+
+    function toggleEventHandlers (toggle) {
+      var curEditor = EditorManager.getCurrentFullEditor();
+      if (toggle) {
+        EditorManager.on('activeEditorChange', eventManager.activeEditorChangeHandler);
+        socketClient.on('gazeChanged', eventManager.eyeTrackerHandler);
+        socketClient.exec('start', globals.port, globals.ipAddress);
+        //This handles the case when brackets starts with an opened file (so no activeEditorChange event happens)
+        eventManager.activeEditorChangeHandler(null, curEditor, null);
+      } else {
+        EditorManager.off('activeEditorChange', eventManager.activeEditorChangeHandler);
+        socketClient.off('gazeChanged', eventManager.eyeTrackerHandler);
+        socketClient.exec('stop');
+        eventManager.activeEditorChangeHandler(null, null, curEditor);
+      }
+    }
+
+    function menuToggle() {
+      var command = CommandManager.get(commandId);
+      var toggleCommandChanged = !command.getChecked();
+
+      prefs.set('enabled', toggleCommandChanged);
+      command.setChecked(toggleCommandChanged);
+      $todoIcon.toggleClass('active', toggleCommandChanged);
+
+      keyManager.setUserDefinedKeys(prefs.get('keys'));
+      systemInfoProvider.exec('getOSType').done(function (osType) {
+        globals.adjustToOSType(osType);
+      });
+
+      toggleEventHandlers(toggleCommandChanged);
+    }
+
+    toggleEventHandlers(prefs.get('enabled'));
   };
 });

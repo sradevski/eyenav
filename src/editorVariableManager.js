@@ -5,21 +5,21 @@ define(function (require, exports, module) {
   var EditorManager = brackets.getModule('editor/EditorManager'),
     TokenUtils = brackets.getModule('utils/TokenUtils');
 
-  var isFullScreen = function () {
+  function isFullScreen () {
     if (window.innerHeight === window.screen.height && window.innerWidth === window.screen.width) {
       return true;
     }
     return false;
-  };
+  }
   
-  var getDisplaySize = function(){
+  function getDisplaySize(){
     return {
       height: window.screen.height,
       width: window.screen.width
     };
-  };
+  }
 
-  var getCurrentEditorSizeAndCoords = function () {
+  function getCurrentEditorSizeAndCoords () {
     var curEditor = EditorManager.getCurrentFullEditor();
     var cmDisplayObject = curEditor._codeMirror.display;
 
@@ -42,9 +42,9 @@ define(function (require, exports, module) {
     coords.width = editorWidth;
 
     return coords;
-  };
+  }
 
-  var getCharSize = function () {
+  function getCharSize () {
     var curEditor = EditorManager.getCurrentFullEditor();
     var charWidth = curEditor._codeMirror.display.cachedCharWidth || 12;
     var rowHeight = curEditor._codeMirror.display.cachedTextHeight || 25;
@@ -53,9 +53,9 @@ define(function (require, exports, module) {
       width: charWidth,
       height: rowHeight
     };
-  };
+  }
 
-  var getCursorCoords = function () {
+  function getCursorCoords () {
     var curEditor = EditorManager.getCurrentFullEditor();
     var cursorPos = curEditor.getCursorPos();
     var charSize = getCharSize();
@@ -64,35 +64,35 @@ define(function (require, exports, module) {
       x: cursorPos.ch * charSize.width,
       y: cursorPos.line * charSize.height
     };
-  };
+  }
 
-  var getNumOfLines = function () {
+  function getNumOfLines () {
     var curEditor = EditorManager.getCurrentFullEditor();
     var charSize = getCharSize();
     //Future: Figure out where the 30 pixels come from (which variable)
     var scrollerHeight = curEditor._codeMirror.display.scroller.children[0].clientHeight - 30;
     
     return Math.round(scrollerHeight / charSize.height);
-  };
+  }
 
-  var getNumOfVisibleLines = function () {
+  function getNumOfVisibleLines () {
     var editorCoordInfo = getCurrentEditorSizeAndCoords();
     var charSize = getCharSize();
 
     return Math.round(editorCoordInfo.height / charSize.height);
-  };
+  }
 
-  var getScrolledLines = function () {
+  function getScrolledLines () {
     var curEditor = EditorManager.getCurrentFullEditor();
     var scrollPos = curEditor.getScrollPos();
     var charSize = getCharSize();
     
     return Math.round(scrollPos.y / charSize.height);
-  };
+  }
 
-  var getTokenAtWrapper = function(curEditor, cursorPos){
+  function getTokenAtWrapper(curEditor, cursorPos){
     return TokenUtils.getTokenAt(curEditor._codeMirror, cursorPos, false);
-  };
+  }
 
   exports.isFullScreen = isFullScreen;
   exports.getCurrentEditorSizeAndCoords = getCurrentEditorSizeAndCoords;

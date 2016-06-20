@@ -1,4 +1,4 @@
-define(function(require, exports, module) {
+define(function (require, exports, module) {
   'use strict';
 
   var EditorManager = brackets.getModule('editor/EditorManager'),
@@ -11,15 +11,23 @@ define(function(require, exports, module) {
   var keys = keyManager.keys;
 
   //This is the main loop of the program. Making a separate loop will result in a fixed refresh rate, but even the varying rate works quite well.
-  function eyeTrackerHandler (info, gazeData) {
+  function gazeChangedHandler(info, gazeData) {
     //Future: Refactor this so it is easily extensible with the other modifier functions. Think of a better way to manage the keys (having something like required each key adds an additional function if pressed or smth). One approach is using "before:" "after:" events for each movement.
-    for (var key in keys) {
-      if (keyManager.isValidKeyCommand(keys[key])) {
-        movements.executeMovement(keys[key].func, [gazeData, keys.textSelection.isPressed, keys.gazeManualOffset.isPressed]);
-        if (keys[key].releaseAfterFunc) {
-          keyManager.setKeyReleased(keys[key]);
+
+    if (gazeData.state === 1) {
+      for (var key in keys) {
+        if (keyManager.isValidKeyCommand(keys[key])) {
+          movements.executeMovement(keys[key].func, [gazeData, keys.textSelection.isPressed, keys.gazeManualOffset.isPressed]);
+          if (keys[key].releaseAfterFunc) {
+            keyManager.setKeyReleased(keys[key]);
+          }
         }
       }
+      
+      globals.setToolIconToState('tracker-data', true);
+    } 
+    else{
+      globals.setToolIconToState('connected-to-server', true);
     }
   }
 
@@ -34,8 +42,18 @@ define(function(require, exports, module) {
     }
   }
 
+  function trackerConnectedHandler() {
+    globals.setToolIconToState('connected-to-server', true);
+    console.log('EyeNav connected to the eye tracker server.');
+  }
+
+  function trackerDisconnectedHandler() {
+    globals.setToolIconToState('active', true);
+    console.log('the eye tracker server dropped and EyeNav was disconnected.');
+  }
+
   //Future: Tell users in the status bar whether the eye tracking is tracking the gaze (sending data) when they press any command.
-  function keyEventHandler (bracketsEvent, editor, event) {
+  function keyEventHandler(bracketsEvent, editor, event) {
     var key;
     //This is used to handle a strange behavior on windows where a key's location is correct on keydown, but always 0 on keyup.
     if (globals.allowAnyKeyLocationOnRelease) {
@@ -56,7 +74,9 @@ define(function(require, exports, module) {
       }
     }
   }
- 
+
   module.exports.activeEditorChangeHandler = activeEditorChangeHandler;
-  module.exports.eyeTrackerHandler = eyeTrackerHandler;
+  module.exports.gazeChangedHandler = gazeChangedHandler;
+  module.exports.trackerConnectedHandler = trackerConnectedHandler;
+  module.exports.trackerDisconnectedHandler = trackerDisconnectedHandler;
 });

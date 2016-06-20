@@ -3,7 +3,7 @@
 
   var WebSocket = require('ws');
 
-  var _domainManager = null,
+  var _domainManager,
     DOMAIN_NAME = 'socketDomain';
 
   var ws,
@@ -12,12 +12,9 @@
 
   //Note: Each Gaze entry should come with a state field denoting the state of the gaze. I am using the states from EyeTribe as a basis, and each server should implement the same states. Tracking Gaze: 1, Not Tracking: 2, Everything else: 10
 
-  function isValidGazeData (gazeData) {
-    if (gazeData.state === 1) {
-      return true;
-    }
-
-    return false;
+  //Future: Check whether the server sends gaze data or some message, command, etc. 
+  function isGazeData (serverData) {
+    return true;
   }
 
   function isSocketRunning () {
@@ -33,26 +30,17 @@
         }
       });
 
-      ws.on('onclose', function (code, message) {
-        _domainManager.emitEvent(DOMAIN_NAME, 'trackerDisconnected', code, message);
+      ws.on('close', function () {
+        _domainManager.emitEvent(DOMAIN_NAME, 'trackerDisconnected');
       });
 
       ws.on('message', function (serverMessage, flags) {
         var serverDataObject = JSON.parse(serverMessage);
-        if (isValidGazeData(serverDataObject)) {
+        if (isGazeData(serverDataObject)) {
           _domainManager.emitEvent(DOMAIN_NAME, 'gazeChanged', serverDataObject);
         }
       });
-
-      ws.on('onerror', function (err) {
-        _domainManager.emitEvent(DOMAIN_NAME, 'serverError', err);
-      });
-    } else {
-      _domainManager.emitEvent(DOMAIN_NAME, 'serverError', {
-        type: 'user-defined',
-        error: 'Socket is not open. Please make sure that the server is running.'
-      });
-    }
+    } 
   }
 
   function startServer (port, ipAddress) {
@@ -117,19 +105,7 @@
 
     domainManager.registerEvent(DOMAIN_NAME, 'trackerConnected', []);
 
-    domainManager.registerEvent(DOMAIN_NAME, 'trackerDisconnected', [{
-      name: 'code',
-      type: 'Number'
-    }, {
-      name: 'message',
-      type: 'String'
-    }]);
-
-    domainManager.registerEvent(DOMAIN_NAME, 'serverError', [{
-      name: 'err',
-      type: 'object'
-    }]);
-
+    domainManager.registerEvent(DOMAIN_NAME, 'trackerDisconnected', []);
 
     domainManager.registerEvent(DOMAIN_NAME, 'gazeChanged', [{
       name: 'gazeData',

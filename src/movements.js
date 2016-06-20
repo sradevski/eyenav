@@ -5,17 +5,17 @@ define(function (require, exports, module) {
     editorVariableManager = require('./editorVariableManager'),
     movementDataManager = require('./movementDataManager');
 
-  var verticalScrollCharacterPos = null;
-  var selectionStartPosition = null;
+  var verticalScrollCharacterPos,
+    selectionStartPosition;
 
-  function makeCursorMovement (line, character, isSelection) {
+  function makeCursorMovement(line, character, isSelection) {
     var curEditor = EditorManager.getCurrentFullEditor();
     var currentCursor = curEditor.getCursorPos();
 
-    if (isSelection && selectionStartPosition === null) {
+    if (isSelection && !selectionStartPosition) {
       selectionStartPosition = currentCursor;
-    } else if (!isSelection && selectionStartPosition !== null) {
-      selectionStartPosition = null;
+    } else if (!isSelection && selectionStartPosition) {
+      selectionStartPosition = undefined;
     }
 
     curEditor.setCursorPos(line, character);
@@ -31,7 +31,7 @@ define(function (require, exports, module) {
     }
   }
 
-  function cursorClick (gazeData, isSelection) {
+  function cursorClick(gazeData, isSelection) {
     var cursorGoal = movementDataManager.calculateCursorOffset(gazeData, false);
     var adjustedCursor = movementDataManager.adjustCursorToValidLine(cursorGoal, gazeData);
 
@@ -40,7 +40,7 @@ define(function (require, exports, module) {
     }
   }
 
-  function verticalScroll (gazeData) {
+  function verticalScroll(gazeData) {
     var curEditor = EditorManager.getCurrentFullEditor();
     var curScrollPos = curEditor.getScrollPos();
     var velocity = movementDataManager.calculateYScrollVelocity(gazeData);
@@ -48,7 +48,7 @@ define(function (require, exports, module) {
     curEditor.setScrollPos(curScrollPos.x, curScrollPos.y + velocity);
   }
 
-  function verticalCursorScroll (gazeData, isSelection) {
+  function verticalCursorScroll(gazeData, isSelection) {
     var curEditor = EditorManager.getCurrentFullEditor();
     var cursorPos = curEditor.getCursorPos();
     var cursorOffset = movementDataManager.calculateCursorOffset(gazeData, true);
@@ -60,7 +60,7 @@ define(function (require, exports, module) {
     }
   }
 
-  function horizontalCursorScroll (gazeData, isSelection) {
+  function horizontalCursorScroll(gazeData, isSelection) {
     var curEditor = EditorManager.getCurrentFullEditor();
     var cursorPos = curEditor.getCursorPos();
     var cursorOffset = movementDataManager.calculateCursorOffset(gazeData, true);
@@ -69,7 +69,7 @@ define(function (require, exports, module) {
     makeCursorMovement(cursorPos.line, goalCursorPos, isSelection);
   }
 
-  function arrowKeysMovements (direction) {
+  function arrowKeysMovements(direction) {
     var passedDirection = direction;
 
     return function (gazeData, isSelection, isGazeOffset) {
@@ -101,12 +101,12 @@ define(function (require, exports, module) {
       if (isGazeOffset) {
         movementDataManager.adjustManualOffset(goalCursorPos.line - cursorPos.line, goalCursorPos.ch - cursorPos.ch);
       }
-      
+
       makeCursorMovement(goalCursorPos.line, goalCursorPos.ch, isSelection);
     };
   }
 
-  function selectHoveredWord () {
+  function selectHoveredWord() {
     var curEditor = EditorManager.getCurrentFullEditor();
     var currentCursor = curEditor.getCursorPos();
     var token = movementDataManager.getTokenAtPos(currentCursor);
@@ -121,7 +121,7 @@ define(function (require, exports, module) {
   }
 
   //Future: Do a more flexible implementation of this (including the checking of verticalCursorScroll)
-  function executeMovement (actionToExecute, funcArguments) {
+  function executeMovement(actionToExecute, funcArguments) {
     var curEditor = EditorManager.getCurrentFullEditor();
     var cursorPos = curEditor.getCursorPos();
 
@@ -129,7 +129,7 @@ define(function (require, exports, module) {
       if (!verticalScrollCharacterPos)
         verticalScrollCharacterPos = cursorPos.ch;
     } else {
-      verticalScrollCharacterPos = null;
+      verticalScrollCharacterPos = undefined;
     }
 
     actionToExecute.apply(undefined, funcArguments);

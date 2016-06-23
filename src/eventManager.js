@@ -23,10 +23,9 @@ define(function (require, exports, module) {
           }
         }
       }
-      
+
       globals.setToolIconToState('tracker-data', true);
-    } 
-    else{
+    } else {
       globals.setToolIconToState('connected-to-server', true);
     }
   }
@@ -52,7 +51,6 @@ define(function (require, exports, module) {
     console.log('the eye tracker server dropped and EyeNav was disconnected.');
   }
 
-  //Future: Tell users in the status bar whether the eye tracking is tracking the gaze (sending data) when they press any command.
   function keyEventHandler(bracketsEvent, editor, event) {
     var key;
     //This is used to handle a strange behavior on windows where a key's location is correct on keydown, but always 0 on keyup.

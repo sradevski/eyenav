@@ -1,11 +1,11 @@
 define(function (require, exports, module) {
   'use strict';
-  
+
   //Helper function that merges two or more objects into one.
   function collect() {
     var ret = {};
     var len = arguments.length;
-    for (var i=0; i<len; i++) {
+    for (var i = 0; i < len; i++) {
       for (var p in arguments[i]) {
         if (arguments[i].hasOwnProperty(p)) {
           ret[p] = arguments[i][p];
@@ -14,7 +14,7 @@ define(function (require, exports, module) {
     }
     return ret;
   }
-  
+
   var triggerKeys = {
     commandToggle: {
       keyCode: 18,
@@ -25,7 +25,7 @@ define(function (require, exports, module) {
       func: function () {}
     }
   };
-  
+
   var modifierKeys = {
     textSelection: {
       keyCode: 16,
@@ -44,8 +44,8 @@ define(function (require, exports, module) {
       func: function () {}
     },
   };
-  
-  var functionKeys = {
+
+  var commandKeys = {
     freeMove: {
       keyCode: 76,
       location: [0],
@@ -128,19 +128,19 @@ define(function (require, exports, module) {
     }
   };
 
-  var keys = collect(triggerKeys, modifierKeys, functionKeys);
-  
+  var keys = collect(triggerKeys, modifierKeys, commandKeys);
+
   var isKeyPressed = function (key) {
     return key.isPressed;
   };
 
-  function setKeyPressed (key) {
+  function setKeyPressed(key) {
     if (key) {
       key.isPressed = true;
     }
   }
 
-  function setKeyReleased (key) {
+  function setKeyReleased(key) {
     if (key) {
       key.isPressed = false;
 
@@ -155,7 +155,7 @@ define(function (require, exports, module) {
     }
   }
 
-  function getKeyFromCode (keyCode) {
+  function getKeyFromCode(keyCode) {
     for (var k in keys) {
       if (keys[k].keyCode === keyCode)
         return keys[k];
@@ -164,7 +164,7 @@ define(function (require, exports, module) {
     return undefined;
   }
 
-  function getKeyFromCodeAndLocation (keyCode, keyLocation) {
+  function getKeyFromCodeAndLocation(keyCode, keyLocation) {
     for (var k in keys) {
       if (keys[k].keyCode === keyCode && keys[k].location.indexOf(keyLocation) !== -1)
         return keys[k];
@@ -173,7 +173,7 @@ define(function (require, exports, module) {
     return undefined;
   }
 
-  function isValidKeyCommand (key) {
+  function isValidKeyCommand(key) {
     if (key === keys.commandToggle || !keys.commandToggle.isPressed) {
       return false;
     }
@@ -182,8 +182,19 @@ define(function (require, exports, module) {
   }
 
 
-  function setUserDefinedKeys (userDefinedKeys) {
-    //ToDo: Merge the user-provided keys and the default keys. This maybe should be done in a different location, such as the init file.
+  //Note: This works only for 2 level objects such as mine, it is not flexible at all. As Brackets doesn't allow other libraries and I cannot use lodash or similar, this solution is enough.
+  function setUserDefinedKeys(userKeys) {
+    if (userKeys && Object.keys(userKeys).length) {
+
+      Object.keys(userKeys).forEach(function (key) {
+        Object.keys(userKeys[key]).forEach(function (inKey) {
+          if (inKey in keys[key]) {
+            keys[key][inKey] = userKeys[key][inKey];
+          }
+        });
+      });
+
+    }
   }
 
   exports.getKeyFromCodeAndLocation = getKeyFromCodeAndLocation;

@@ -57,8 +57,8 @@ define(function (require, exports, module) {
     }
 
     function menuToggle() {
-      var command = CommandManager.get(commandId);
-      var toggleCommandChanged = !command.getChecked();
+      var command = CommandManager.get(commandId),
+        toggleCommandChanged = !command.getChecked();
 
       prefs.set('enabled', toggleCommandChanged);
       command.setChecked(toggleCommandChanged);

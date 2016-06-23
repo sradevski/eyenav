@@ -9,15 +9,14 @@ define(function (require, exports, module) {
     selectionStartPosition;
 
   function makeCursorMovement(line, character, isSelection) {
-    var curEditor = EditorManager.getCurrentFullEditor();
-    var currentCursor = curEditor.getCursorPos();
+    var curEditor = EditorManager.getCurrentFullEditor(),
+      currentCursor = curEditor.getCursorPos();
 
     if (isSelection && !selectionStartPosition) {
       selectionStartPosition = currentCursor;
     } else if (!isSelection && selectionStartPosition) {
       selectionStartPosition = undefined;
     }
-
     curEditor.setCursorPos(line, character);
 
     if (selectionStartPosition) {
@@ -32,8 +31,8 @@ define(function (require, exports, module) {
   }
 
   function cursorClick(gazeData, isSelection) {
-    var cursorGoal = movementDataManager.calculateCursorOffset(gazeData, false);
-    var adjustedCursor = movementDataManager.adjustCursorToValidLine(cursorGoal, gazeData);
+    var cursorGoal = movementDataManager.calculateCursorOffset(gazeData, false),
+      adjustedCursor = movementDataManager.adjustCursorToValidLine(cursorGoal, gazeData);
 
     if (movementDataManager.isGoalLineWithinBorders(adjustedCursor.vertical)) {
       makeCursorMovement(adjustedCursor.vertical, adjustedCursor.horizontal, isSelection);
@@ -41,19 +40,18 @@ define(function (require, exports, module) {
   }
 
   function verticalScroll(gazeData) {
-    var curEditor = EditorManager.getCurrentFullEditor();
-    var curScrollPos = curEditor.getScrollPos();
-    var velocity = movementDataManager.calculateYScrollVelocity(gazeData);
+    var curEditor = EditorManager.getCurrentFullEditor(),
+      curScrollPos = curEditor.getScrollPos(),
+      velocity = movementDataManager.calculateYScrollVelocity(gazeData);
 
     curEditor.setScrollPos(curScrollPos.x, curScrollPos.y + velocity);
   }
 
   function verticalCursorScroll(gazeData, isSelection) {
-    var curEditor = EditorManager.getCurrentFullEditor();
-    var cursorPos = curEditor.getCursorPos();
-    var cursorOffset = movementDataManager.calculateCursorOffset(gazeData, true);
-
-    var goalLinePos = cursorPos.line + cursorOffset.vertical;
+    var curEditor = EditorManager.getCurrentFullEditor(),
+      cursorPos = curEditor.getCursorPos(),
+      cursorOffset = movementDataManager.calculateCursorOffset(gazeData, true),
+      goalLinePos = cursorPos.line + cursorOffset.vertical;
 
     if (movementDataManager.isGoalLineWithinBorders(goalLinePos)) {
       makeCursorMovement(goalLinePos, verticalScrollCharacterPos, isSelection);
@@ -61,11 +59,11 @@ define(function (require, exports, module) {
   }
 
   function horizontalCursorScroll(gazeData, isSelection) {
-    var curEditor = EditorManager.getCurrentFullEditor();
-    var cursorPos = curEditor.getCursorPos();
-    var cursorOffset = movementDataManager.calculateCursorOffset(gazeData, true);
+    var curEditor = EditorManager.getCurrentFullEditor(),
+      cursorPos = curEditor.getCursorPos(),
+      cursorOffset = movementDataManager.calculateCursorOffset(gazeData, true),
+      goalCursorPos = cursorPos.ch + cursorOffset.horizontal;
 
-    var goalCursorPos = cursorPos.ch + cursorOffset.horizontal;
     makeCursorMovement(cursorPos.line, goalCursorPos, isSelection);
   }
 
@@ -73,13 +71,12 @@ define(function (require, exports, module) {
     var passedDirection = direction;
 
     return function (gazeData, isSelection, isGazeOffset) {
-      var curEditor = EditorManager.getCurrentFullEditor();
-      var cursorPos = curEditor.getCursorPos();
-
-      var goalCursorPos = {
-        line: cursorPos.line,
-        ch: cursorPos.ch
-      };
+      var curEditor = EditorManager.getCurrentFullEditor(),
+        cursorPos = curEditor.getCursorPos(),
+        goalCursorPos = {
+          line: cursorPos.line,
+          ch: cursorPos.ch
+        };
 
       switch (passedDirection) {
       case 'up':
@@ -107,9 +104,9 @@ define(function (require, exports, module) {
   }
 
   function selectHoveredWord() {
-    var curEditor = EditorManager.getCurrentFullEditor();
-    var currentCursor = curEditor.getCursorPos();
-    var token = movementDataManager.getTokenAtPos(currentCursor);
+    var curEditor = EditorManager.getCurrentFullEditor(),
+      currentCursor = curEditor.getCursorPos(),
+      token = movementDataManager.getTokenAtPos(currentCursor);
 
     curEditor.setSelection({
       line: currentCursor.line,
@@ -122,8 +119,8 @@ define(function (require, exports, module) {
 
   //Future: Do a more flexible implementation of this (including the checking of verticalCursorScroll)
   function executeMovement(actionToExecute, funcArguments) {
-    var curEditor = EditorManager.getCurrentFullEditor();
-    var cursorPos = curEditor.getCursorPos();
+    var curEditor = EditorManager.getCurrentFullEditor(),
+      cursorPos = curEditor.getCursorPos();
 
     if (actionToExecute === verticalCursorScroll) {
       if (!verticalScrollCharacterPos)

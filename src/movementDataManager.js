@@ -1,62 +1,62 @@
 define(function (require, exports, module) {
   'use strict';
   var EditorManager = brackets.getModule('editor/EditorManager'),
-      editorVariableManager = require('./editorVariableManager'),
-      globals = require('./globals');
+    editorVariableManager = require('./editorVariableManager'),
+    globals = require('./globals');
 
- 
+
   //This calculates the theoretical average error for most eye trackers, which is 1 degree angle.
-  function getAverageGazeErrorInPixels () {
-    var screenSize = editorVariableManager.getDisplaySize();
-    var errorInMm = globals.distanceFromScreenMm * Math.tan(0.5 * Math.PI / 180);
-    var ppi = Math.sqrt(Math.pow(screenSize.height, 2) + Math.pow(screenSize.width, 2)) / globals.screenInches;
-    var dotPitch = 25.4 / ppi;
+  function getAverageGazeErrorInPixels() {
+    var screenSize = editorVariableManager.getDisplaySize(),
+      errorInMm = globals.distanceFromScreenMm * Math.tan(0.5 * Math.PI / 180),
+      ppi = Math.sqrt(Math.pow(screenSize.height, 2) + Math.pow(screenSize.width, 2)) / globals.screenInches,
+      dotPitch = 25.4 / ppi;
 
     return Math.round(errorInMm / dotPitch);
   }
-  
+
   //It normalizes the xy coordinates having the top right corner of the editor as an origin.
-  function normalizeGazeDataXY (gazeData, editorCoordInfo) {
+  function normalizeGazeDataXY(gazeData, editorCoordInfo) {
     var normalizedData = {};
-    normalizedData.x = (gazeData.x + globals.manualOffset.x) - editorCoordInfo.x;
-    normalizedData.y = (gazeData.y + globals.manualOffset.y) - editorCoordInfo.y;
+    normalizedData.x = Math.round((gazeData.x + globals.manualOffset.x) - editorCoordInfo.x);
+    normalizedData.y = Math.round((gazeData.y + globals.manualOffset.y) - editorCoordInfo.y);
     return normalizedData;
   }
-  
-  function calculateCursorOffset (gazeData, useCursor) {
-    var curEditor = EditorManager.getCurrentFullEditor();
-    var cursorCoords = {
-      x: 0,
-      y: 0
-    };
+
+  function calculateCursorOffset(gazeData, useCursor) {
+    var curEditor = EditorManager.getCurrentFullEditor(),
+      cursorCoords = {
+        x: 0,
+        y: 0
+      };
     if (useCursor) {
       cursorCoords = editorVariableManager.getCursorCoords();
     }
 
-    var normalizedGazeData = normalizeGazeDataXY(gazeData, editorVariableManager.getCurrentEditorSizeAndCoords());
-    var charSize = editorVariableManager.getCharSize();
-    var scrolledLines = editorVariableManager.getScrolledLines();
+    var normalizedGazeData = normalizeGazeDataXY(gazeData, editorVariableManager.getCurrentEditorSizeAndCoords()),
+      charSize = editorVariableManager.getCharSize(),
+      scrolledLines = editorVariableManager.getScrolledLines(),
 
-    var horizontalOffset = Math.round((normalizedGazeData.x - cursorCoords.x) / charSize.width);
-    var verticalOffset = Math.round((normalizedGazeData.y - cursorCoords.y) / charSize.height);
+      horizontalOffset = Math.round((normalizedGazeData.x - cursorCoords.x) / charSize.width),
+      verticalOffset = Math.round((normalizedGazeData.y - cursorCoords.y) / charSize.height);
 
     return {
       horizontal: horizontalOffset,
       vertical: verticalOffset + scrolledLines
     };
   }
+  
+  function adjustCursorToValidLine(cursorGoal, gazeData) {
+    var curEditor = EditorManager.getCurrentFullEditor(),
+      normalizedGazeData = normalizeGazeDataXY(gazeData, editorVariableManager.getCurrentEditorSizeAndCoords()),
+      charSize = editorVariableManager.getCharSize(),
+      avgCharWidthError = Math.round(getAverageGazeErrorInPixels() * 2 / charSize.width),
 
-  function adjustCursorToValidLine (cursorGoal, gazeData) {
-    var curEditor = EditorManager.getCurrentFullEditor();
-    var normalizedGazeData = normalizeGazeDataXY(gazeData, editorVariableManager.getCurrentEditorSizeAndCoords());
-    var charSize = editorVariableManager.getCharSize();
-    var avgCharWidthError = Math.round(getAverageGazeErrorInPixels() * 2 / charSize.width);
-
-    var modulo = normalizedGazeData.y % charSize.height;
-    var direction = modulo < (charSize.height / 2) ? -1 : 1;
-    var originalDirection = direction;
-    var goalLine = cursorGoal.vertical;
-    var lineOffset = 1;
+      modulo = normalizedGazeData.y % charSize.height,
+      direction = modulo < (charSize.height / 2) ? -1 : 1,
+      originalDirection = direction,
+      goalLine = cursorGoal.vertical,
+      lineOffset = 1;
 
     while (curEditor.document.getLine(goalLine).length < (cursorGoal.horizontal - avgCharWidthError)) {
       goalLine = cursorGoal.vertical + (lineOffset * direction);
@@ -71,18 +71,18 @@ define(function (require, exports, module) {
       vertical: goalLine
     };
   }
-  
-  function calculateYScrollVelocity (gazeData) {
-    var editorCoordInfo = editorVariableManager.getCurrentEditorSizeAndCoords();
-    var normalizedGazeData = normalizeGazeDataXY(gazeData, editorCoordInfo);
-    var velocityY = 0;
 
-    var midPoint = editorCoordInfo.height / 2;
-    var epsylon = (editorCoordInfo.height / 100) * globals.epsylonPercentage;
-    var direction = normalizedGazeData.y - midPoint > 0 ? 1 : -1;
-    var speedFactor = globals.speedFactor / editorCoordInfo.height;
-    //From 0 to 1 for half screen (height / 2 - epsylon)
-    var normalizedYLocation = (Math.abs(normalizedGazeData.y - midPoint) - epsylon) / (midPoint - epsylon);
+  function calculateYScrollVelocity(gazeData) {
+    var editorCoordInfo = editorVariableManager.getCurrentEditorSizeAndCoords(),
+      normalizedGazeData = normalizeGazeDataXY(gazeData, editorCoordInfo),
+      velocityY = 0,
+
+      midPoint = editorCoordInfo.height / 2,
+      epsylon = (editorCoordInfo.height / 100) * globals.epsylonPercentage,
+      direction = normalizedGazeData.y - midPoint > 0 ? 1 : -1,
+      speedFactor = globals.speedFactor / editorCoordInfo.height,
+      //From 0 to 1 for half screen (height / 2 - epsylon)
+      normalizedYLocation = (Math.abs(normalizedGazeData.y - midPoint) - epsylon) / (midPoint - epsylon);
 
     //Check if the user is looking inside the editor window
     if (normalizedGazeData.y > 0 || normalizedGazeData.y <= editorCoordInfo.height) {
@@ -94,17 +94,17 @@ define(function (require, exports, module) {
 
     return velocityY;
   }
-  
-  function adjustManualOffset(yOffset, xOffset){
+
+  function adjustManualOffset(yOffset, xOffset) {
     var charSize = editorVariableManager.getCharSize();
     globals.manualOffset.x += xOffset * charSize.width;
     globals.manualOffset.y += yOffset * charSize.height;
   }
-  
-  function isGoalLineWithinBorders (goalLine) {
-    var numOfLines = editorVariableManager.getNumOfLines();
-    var scrolledLines = editorVariableManager.getScrolledLines();
-    var maxLinesInScreen = editorVariableManager.getNumOfVisibleLines();
+
+  function isGoalLineWithinBorders(goalLine) {
+    var numOfLines = editorVariableManager.getNumOfLines(),
+      scrolledLines = editorVariableManager.getScrolledLines(),
+      maxLinesInScreen = editorVariableManager.getNumOfVisibleLines();
 
     if (goalLine >= scrolledLines && goalLine < (scrolledLines + maxLinesInScreen)) {
       return true;
@@ -112,8 +112,8 @@ define(function (require, exports, module) {
 
     return false;
   }
-  
-  function getTokenAtPos (cursorPos) {
+
+  function getTokenAtPos(cursorPos) {
     var curEditor = EditorManager.getCurrentFullEditor();
     if (cursorPos) {
       return editorVariableManager.getTokenAtWrapper(curEditor, cursorPos);
@@ -122,7 +122,7 @@ define(function (require, exports, module) {
       return editorVariableManager.getTokenAtWrapper(curEditor, curEditor.getCursorPos());
     }
   }
-  
+
   exports.adjustCursorToValidLine = adjustCursorToValidLine;
   exports.normalizeGazeDataXY = normalizeGazeDataXY;
   exports.calculateYScrollVelocity = calculateYScrollVelocity;

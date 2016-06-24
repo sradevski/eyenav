@@ -32,7 +32,7 @@ define(function (require, exports, module) {
     if (useCursor) {
       cursorCoords = editorVariableManager.getCursorCoords();
     }
-
+    
     var normalizedGazeData = normalizeGazeDataXY(gazeData, editorVariableManager.getCurrentEditorSizeAndCoords()),
       charSize = editorVariableManager.getCharSize(),
       scrolledLines = editorVariableManager.getScrolledLines(),
@@ -40,6 +40,7 @@ define(function (require, exports, module) {
       horizontalOffset = Math.round((normalizedGazeData.x - cursorCoords.x) / charSize.width),
       verticalOffset = Math.round((normalizedGazeData.y - cursorCoords.y) / charSize.height);
 
+    
     return {
       horizontal: horizontalOffset,
       vertical: verticalOffset + scrolledLines

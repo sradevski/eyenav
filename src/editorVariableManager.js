@@ -29,6 +29,7 @@ define(function (require, exports, module) {
       verticalScrollBarWidth = cmDisplayObject.barWidth,
       rightSideMenuWidth = 30,
       topAppBarHeight = isFullScreen() ? 0 : 11,
+      //ToDo: If the filetree sidebar is hidden (Cmd+Shift+H), this should be 0;
       fileTreeBarWidth = window.innerWidth - gutterWidth - editorWidth - verticalScrollBarWidth - rightSideMenuWidth;
 
     var coords = {};

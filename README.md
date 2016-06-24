@@ -18,11 +18,11 @@ There are currently 2 popular eye trackers aimed at the mass market, and we prov
 
 #### EyeTribe 
 Install information can be found at: [EyeTribe Getting Started](http://dev.theeyetribe.com/start/). 
-The EyeTribe WebSocket Server can be found at: 
+The EyeTribe WebSocket Server can be found: [EyeTribe Web Socket Server](https://github.com/sradevski/EyeTribe-Web-Socket-Server)
 
 #### Tobii EyeX
 Install information can be found at: [Tobii EyeX Getting Started](http://developer.tobii.com/eyex-setup/). 
-The Tobii EyeX WebSocket Server can be found at: 
+The Tobii EyeX WebSocket Server can be found at: [Tobii EyeX Web Socket Server](https://github.com/sradevski/Tobii-EyeX-Web-Socket-Server)
 
 #### Simulator
 If, for any reason, you want to use a simulator websocket server, you can find it at: [EyeNav Eye Tracker Simulator](https://github.com/sradevski/EyeNav-WebSocket-EyeTracker-Simulator).

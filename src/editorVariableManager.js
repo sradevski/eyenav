@@ -29,7 +29,6 @@ define(function (require, exports, module) {
       verticalScrollBarWidth = cmDisplayObject.barWidth,
       rightSideMenuWidth = 30,
       topAppBarHeight = isFullScreen() ? 0 : 11,
-      //ToDo: If the filetree sidebar is hidden (Cmd+Shift+H), this should be 0;
       fileTreeBarWidth = window.innerWidth - gutterWidth - editorWidth - verticalScrollBarWidth - rightSideMenuWidth;
 
     var coords = {};
@@ -52,38 +51,43 @@ define(function (require, exports, module) {
     };
   }
 
-  function getCursorCoords() {
+  function getScrolledHeight() {
     var curEditor = EditorManager.getCurrentFullEditor(),
-      cursorPos = curEditor.getCursorPos(),
-      charSize = getCharSize();
+      scrollPos = curEditor.getScrollPos();
 
-    return {
-      x: Math.round(cursorPos.ch * charSize.width),
-      y: Math.round(cursorPos.line * charSize.height)
-    };
+    return scrollPos.y;
   }
 
-  function getNumOfLines() {
-    var curEditor = EditorManager.getCurrentFullEditor(),
+  function getCursorLocationFromCoords(x, y, line) {
+    var cmEditor = EditorManager.getCurrentFullEditor()._codeMirror;
+
+    return cmEditor.coordsChar({
+      left: x,
+      top: y
+    }, 'local');
+  }
+
+  function getCursorCoords(cursorObj) {
+    var cmEditor = EditorManager.getCurrentFullEditor()._codeMirror;
+    return cmEditor.cursorCoords(cursorObj, 'local');
+  }
+
+  
+  //Note: There is a distinction between a line and a row (visible line) when line wrapping option is on. A line can have multiple rows when wrapped.
+  function getRowLengthAtY(height) {
+    var cmEditor = EditorManager.getCurrentFullEditor()._codeMirror,
+      editorVars = getCurrentEditorSizeAndCoords(),
       charSize = getCharSize(),
-      scrollerHeight = curEditor._codeMirror.display.scroller.children[0].clientHeight - 30;
+      cursorLocation = getCursorLocationFromCoords(editorVars.width, height),
+      lineHeight = cmEditor.getLineHandle(cursorLocation.line).height,
+      rowLength = cursorLocation.ch;
 
-    return Math.round(scrollerHeight / charSize.height);
-  }
+    //If line is wrapped
+    if (lineHeight >= charSize.height * 2) {
+      rowLength = cursorLocation.ch - getCursorLocationFromCoords(editorVars.width, height - charSize.height).ch;
+    }
 
-  function getNumOfVisibleLines() {
-    var editorCoordInfo = getCurrentEditorSizeAndCoords(),
-      charSize = getCharSize();
-
-    return Math.round(editorCoordInfo.height / charSize.height);
-  }
-
-  function getScrolledLines() {
-    var curEditor = EditorManager.getCurrentFullEditor(),
-      scrollPos = curEditor.getScrollPos(),
-      charSize = getCharSize();
-
-    return Math.round(scrollPos.y / charSize.height);
+    return rowLength;
   }
 
   function getTokenAtWrapper(curEditor, cursorPos) {
@@ -92,11 +96,11 @@ define(function (require, exports, module) {
 
   exports.isFullScreen = isFullScreen;
   exports.getCurrentEditorSizeAndCoords = getCurrentEditorSizeAndCoords;
-  exports.getCursorCoords = getCursorCoords;
   exports.getCharSize = getCharSize;
-  exports.getNumOfLines = getNumOfLines;
-  exports.getNumOfVisibleLines = getNumOfVisibleLines;
-  exports.getScrolledLines = getScrolledLines;
+  exports.getScrolledHeight = getScrolledHeight;
   exports.getTokenAtWrapper = getTokenAtWrapper;
   exports.getDisplaySize = getDisplaySize;
+  exports.getCursorLocationFromCoords = getCursorLocationFromCoords;
+  exports.getCursorCoords = getCursorCoords;
+  exports.getRowLengthAtY = getRowLengthAtY;
 });

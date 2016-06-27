@@ -46,14 +46,6 @@ define(function (require, exports, module) {
   };
 
   var commandKeys = {
-    freeMove: {
-      keyCode: 76,
-      location: [0],
-      btnName: 'L',
-      isPressed: false,
-      releaseAfterFunc: false,
-      func: require('./movements').cursorClick
-    },
     click: {
       keyCode: 81,
       location: [0],

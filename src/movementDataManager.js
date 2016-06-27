@@ -23,53 +23,55 @@ define(function (require, exports, module) {
     return normalizedData;
   }
 
-  function calculateCursorOffset(gazeData, useCursor) {
-    var curEditor = EditorManager.getCurrentFullEditor(),
-      cursorCoords = {
-        x: 0,
-        y: 0
-      };
-    if (useCursor) {
-      cursorCoords = editorVariableManager.getCursorCoords();
-    }
-    
+  function calculateCursorGoal(gazeData, currentRowOnly) {
     var normalizedGazeData = normalizeGazeDataXY(gazeData, editorVariableManager.getCurrentEditorSizeAndCoords()),
-      charSize = editorVariableManager.getCharSize(),
-      scrolledLines = editorVariableManager.getScrolledLines(),
+      scrolledHeight = editorVariableManager.getScrolledHeight(),
+      xLocation = normalizedGazeData.x,
+      yLocation = normalizedGazeData.y + scrolledHeight;
 
-      horizontalOffset = Math.round((normalizedGazeData.x - cursorCoords.x) / charSize.width),
-      verticalOffset = Math.round((normalizedGazeData.y - cursorCoords.y) / charSize.height);
+    if (currentRowOnly) {
+      var cursorCoords = editorVariableManager.getCursorCoords();
+      yLocation = (cursorCoords.top + cursorCoords.bottom) / 2;
+    }
 
-    
-    return {
-      horizontal: horizontalOffset,
-      vertical: verticalOffset + scrolledLines
-    };
+    return editorVariableManager.getCursorLocationFromCoords(xLocation, yLocation);
   }
-  
-  function adjustCursorToValidLine(cursorGoal, gazeData) {
-    var curEditor = EditorManager.getCurrentFullEditor(),
-      normalizedGazeData = normalizeGazeDataXY(gazeData, editorVariableManager.getCurrentEditorSizeAndCoords()),
+
+  function adjustGazeToLongEnoughRow(gazeData) {
+    var normalizedGazeData = normalizeGazeDataXY(gazeData, editorVariableManager.getCurrentEditorSizeAndCoords()),
+      scrolledHeight = editorVariableManager.getScrolledHeight(),
       charSize = editorVariableManager.getCharSize(),
-      avgCharWidthError = Math.round(getAverageGazeErrorInPixels() * 2 / charSize.width),
 
-      modulo = normalizedGazeData.y % charSize.height,
-      direction = modulo < (charSize.height / 2) ? -1 : 1,
+      //A multiple of the theoretical error done by eye trackers.
+      avgCharWidthError = Math.round(getAverageGazeErrorInPixels() / charSize.width) * 2,
+      avgRowHeightError = Math.round(getAverageGazeErrorInPixels() / charSize.height) * 4,
+
+      //If the gaze is closer to the top or bottom of the row.
+      direction = normalizedGazeData.y % charSize.height < (charSize.height / 2) ? -1 : 1,
       originalDirection = direction,
-      goalLine = cursorGoal.vertical,
-      lineOffset = 1;
 
-    while (curEditor.document.getLine(goalLine).length < (cursorGoal.horizontal - avgCharWidthError)) {
-      goalLine = cursorGoal.vertical + (lineOffset * direction);
+      goalCharPosition = normalizedGazeData.x / charSize.width,
+      rowOffset = 1,
+      yAdjustment = 0;
+
+    //Until a long enough row is found, looking as far as several times the gaze error.
+    while (rowOffset < avgRowHeightError) {
+      var rowLength = editorVariableManager.getRowLengthAtY(normalizedGazeData.y + yAdjustment + scrolledHeight);
+      if (rowLength >= (goalCharPosition - avgCharWidthError)) {
+        break;
+      }
+
+      //Adjusting one row up or down in an alternating manner, getting the closest viable row.
+      yAdjustment = (rowOffset * direction) * charSize.height;
       direction *= -1;
       if (direction === originalDirection) {
-        lineOffset += 1;
+        rowOffset += 1;
       }
     }
 
     return {
-      horizontal: cursorGoal.horizontal,
-      vertical: goalLine
+      x: gazeData.x,
+      y: gazeData.y + yAdjustment
     };
   }
 
@@ -101,19 +103,7 @@ define(function (require, exports, module) {
     globals.manualOffset.x += xOffset * charSize.width;
     globals.manualOffset.y += yOffset * charSize.height;
   }
-
-  function isGoalLineWithinBorders(goalLine) {
-    var numOfLines = editorVariableManager.getNumOfLines(),
-      scrolledLines = editorVariableManager.getScrolledLines(),
-      maxLinesInScreen = editorVariableManager.getNumOfVisibleLines();
-
-    if (goalLine >= scrolledLines && goalLine < (scrolledLines + maxLinesInScreen)) {
-      return true;
-    }
-
-    return false;
-  }
-
+  
   function getTokenAtPos(cursorPos) {
     var curEditor = EditorManager.getCurrentFullEditor();
     if (cursorPos) {
@@ -124,11 +114,10 @@ define(function (require, exports, module) {
     }
   }
 
-  exports.adjustCursorToValidLine = adjustCursorToValidLine;
+  exports.adjustGazeToLongEnoughRow = adjustGazeToLongEnoughRow;
   exports.normalizeGazeDataXY = normalizeGazeDataXY;
   exports.calculateYScrollVelocity = calculateYScrollVelocity;
-  exports.calculateCursorOffset = calculateCursorOffset;
+  exports.calculateCursorGoal = calculateCursorGoal;
   exports.adjustManualOffset = adjustManualOffset;
-  exports.isGoalLineWithinBorders = isGoalLineWithinBorders;
   exports.getTokenAtPos = getTokenAtPos;
 });

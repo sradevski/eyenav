@@ -3,7 +3,7 @@
 
   var os = require('os'),
     DOMAIN_NAME = 'systemInfoDomain',
-      _domainManager = undefined;
+      _domainManager;
 
   function getOSType() {
     return os.type();

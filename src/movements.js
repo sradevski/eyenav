@@ -2,7 +2,6 @@ define(function (require, exports, module) {
   'use strict';
 
   var EditorManager = brackets.getModule('editor/EditorManager'),
-    editorVariableManager = require('./editorVariableManager'),
     movementDataManager = require('./movementDataManager');
 
   var verticalScrollCharacterPos,
@@ -31,12 +30,10 @@ define(function (require, exports, module) {
   }
 
   function cursorClick(gazeData, isSelection) {
-    var cursorGoal = movementDataManager.calculateCursorOffset(gazeData, false),
-      adjustedCursor = movementDataManager.adjustCursorToValidLine(cursorGoal, gazeData);
+    var adjustedGaze = movementDataManager.adjustGazeToLongEnoughRow(gazeData),
+      cursorGoal = movementDataManager.calculateCursorGoal(adjustedGaze);
 
-    if (movementDataManager.isGoalLineWithinBorders(adjustedCursor.vertical)) {
-      makeCursorMovement(adjustedCursor.vertical, adjustedCursor.horizontal, isSelection);
-    }
+    makeCursorMovement(cursorGoal.line, cursorGoal.ch, isSelection);
   }
 
   function verticalScroll(gazeData) {
@@ -49,22 +46,17 @@ define(function (require, exports, module) {
 
   function verticalCursorScroll(gazeData, isSelection) {
     var curEditor = EditorManager.getCurrentFullEditor(),
-      cursorPos = curEditor.getCursorPos(),
-      cursorOffset = movementDataManager.calculateCursorOffset(gazeData, true),
-      goalLinePos = cursorPos.line + cursorOffset.vertical;
+      cursorGoal = movementDataManager.calculateCursorGoal(gazeData);
 
-    if (movementDataManager.isGoalLineWithinBorders(goalLinePos)) {
-      makeCursorMovement(goalLinePos, verticalScrollCharacterPos, isSelection);
-    }
+    makeCursorMovement(cursorGoal.line, verticalScrollCharacterPos, isSelection);
   }
 
   function horizontalCursorScroll(gazeData, isSelection) {
     var curEditor = EditorManager.getCurrentFullEditor(),
       cursorPos = curEditor.getCursorPos(),
-      cursorOffset = movementDataManager.calculateCursorOffset(gazeData, true),
-      goalCursorPos = cursorPos.ch + cursorOffset.horizontal;
+      cursorGoal = movementDataManager.calculateCursorGoal(gazeData, true);
 
-    makeCursorMovement(cursorPos.line, goalCursorPos, isSelection);
+    makeCursorMovement(cursorGoal.line, cursorGoal.ch, isSelection);
   }
 
   function arrowKeysMovements(direction) {

@@ -33,7 +33,7 @@ define(function (require, exports, module) {
   exports.port = 8887;
   exports.ipAddress = "127.0.0.1";
   exports.screenInches = 21.5;
-  exports.speedFactor = 80000;
+  exports.speedFactor = 60000;
   exports.epsylonPercentage = 10;
   exports.manualOffset = {
     x: 0,

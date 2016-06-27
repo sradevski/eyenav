@@ -10,7 +10,7 @@
     startTrackerAfterConnecting = false;
 
 
-  //Note: Each Gaze entry should come with a state field denoting the state of the gaze. I am using the states from EyeTribe as a basis, and each server should implement the same states. Tracking Gaze: 1, Not Tracking: 2, Everything else: 10
+  //Note: Each Gaze entry should come with a state field denoting the state of the gaze. Each server should implement the same states. Current states are: Tracking Gaze - 1, Not Tracking - 2, Everything else - 10
 
   //Future: Check whether the server sends gaze data or some message, command, etc. 
   function isGazeData (serverData) {

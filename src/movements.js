@@ -92,7 +92,7 @@ define(function (require, exports, module) {
       }
 
       makeCursorMovement(goalCursorPos.line, goalCursorPos.ch, isSelection);
-    };
+     };
   }
 
   function selectHoveredWord() {

@@ -1,9 +1,54 @@
-//NOTE: This module uses the internal _codeMirror object, so it is fragile from future updates. There are also several hardcoded values for margins that may change in future.
 define(function (require, exports, module) {
   'use strict';
 
   var EditorManager = brackets.getModule('editor/EditorManager'),
-    TokenUtils = brackets.getModule('utils/TokenUtils');
+    TokenUtils = brackets.getModule('utils/TokenUtils'),
+    globals = require('../globals')
+
+  function getScrollPos(){
+    return EditorManager.getCurrentFullEditor().getScrollPos();
+  }
+
+  function setScrollPos(x, y){
+    EditorManager.getCurrentFullEditor().setScrollPos(x, y);
+  }
+
+  function getCursorPos(){
+    return EditorManager.getCurrentFullEditor().getCursorPos();
+  }
+
+  function setCursorPos(line, character){
+    EditorManager.getCurrentFullEditor().setCursorPos(line, character);
+  }
+
+  /// Both start and end object are a {line, character} objects.
+  function setSelection(startLocationObj, endLocationObj){
+    EditorManager.getCurrentFullEditor().setSelection(startLocationObj, endLocationObj);
+  }
+  function setToolIconToTracking() {
+    changeToolbarIconClass('tracker-data');
+  }
+
+  function setToolIconToConnected() {
+    changeToolbarIconClass('connected-to-server');
+  }
+
+  function setToolIconToEnabled(){
+    changeToolbarIconClass('active');
+  }
+
+  function setToolIconToDisabled(){
+    changeToolbarIconClass('');
+  }
+
+  function changeToolbarIconClass(stateClass){
+    if (globals.eyenavIconHolder) {
+      globals.eyenavIconHolder.removeClass();
+      if(stateClass){
+        globals.eyenavIconHolder.addClass(stateClass);
+      }
+    }
+  }
 
   function isFullScreen() {
     if (window.innerHeight === window.screen.height && window.innerWidth === window.screen.width) {
@@ -72,7 +117,7 @@ define(function (require, exports, module) {
     return cmEditor.cursorCoords(cursorObj, 'local');
   }
 
-  
+
   //Note: There is a distinction between a line and a row (visible line) when line wrapping option is on. A line can have multiple rows when wrapped.
   function getRowLengthAtY(height) {
     var cmEditor = EditorManager.getCurrentFullEditor()._codeMirror,
@@ -94,6 +139,16 @@ define(function (require, exports, module) {
     return TokenUtils.getTokenAt(curEditor._codeMirror, cursorPos, false);
   }
 
+  exports.getScrollPos = getScrollPos;
+  exports.setScrollPos = setScrollPos;
+  exports.getCursorPos = getCursorPos;
+  exports.setCursorPos = setCursorPos;
+  exports.setSelection = setSelection;
+  exports.setToolIconToTracking = setToolIconToTracking;
+  exports.setToolIconToConnected = setToolIconToConnected;
+  exports.setToolIconToEnabled = setToolIconToEnabled;
+  exports.setToolIconToDisabled = setToolIconToDisabled;
+
   exports.isFullScreen = isFullScreen;
   exports.getCurrentEditorSizeAndCoords = getCurrentEditorSizeAndCoords;
   exports.getCharSize = getCharSize;
@@ -103,4 +158,5 @@ define(function (require, exports, module) {
   exports.getCursorLocationFromCoords = getCursorLocationFromCoords;
   exports.getCursorCoords = getCursorCoords;
   exports.getRowLengthAtY = getRowLengthAtY;
+
 });

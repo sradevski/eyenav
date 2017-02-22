@@ -104,7 +104,7 @@ You can also change the keyboard shortcuts for each command. In order to see whi
 
 EyeNav has been developed at Nara Institute of Science and Technology (NAIST), Software Engineering Laboratory.
 
-If anyone is interested in improving EyeNav and contributing, please contact me directly. If there is some interest I will create a guide on how to contribute, but it is not necessary at this stage. You can report any bugs or feature requests at: [EyeNav Trello](https://trello.com/b/exmrboqr/eyenav). 
+If anyone is interested in improving EyeNav and contributing, feel free to make a pull request, or submit an issue. If there is some interest in contributing to the project I will create a guide on how to contribute, but it is not necessary at this stage.
 
 ## License
 

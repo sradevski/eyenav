@@ -1,0 +1,15 @@
+#eyenav-icon {
+    background-image: url('../img/eyenav.svg');
+}
+
+#eyenav-icon.active {
+    background-position: 0 -24px;
+}
+
+#eyenav-icon.connected-to-server {
+    background-position: 0 -72px;
+}
+
+#eyenav-icon.tracker-data {
+    background-position: 0 -48px;
+}

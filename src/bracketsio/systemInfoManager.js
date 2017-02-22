@@ -1,12 +1,12 @@
 (function() {
   'use strict';
 
-  var os = require('os'),
+  var systemInfoProvider = require('../systemInfoProvider'),
     DOMAIN_NAME = 'systemInfoDomain',
-      _domainManager;
+    _domainManager;
 
   function getOSType() {
-    return os.type();
+    return systemInfoProvider.getOSType();
   }
 
   //This is how you export a module to be consumed in a brackets plugin

@@ -1,15 +1,22 @@
 {
-  "name": "stevche.radevski.eyenav",
-  "title": "EyeNav: Eye-Tracking IDE Navigator",
-  "description": "EyeNav is a Brackets.io plugin that allows you to do simple navigation in the IDE using an eye-tracking device. It allows you to scroll, click, select text, and more using your eyes and keyboard shortcuts.",
-  "homepage": "https://github.com/sradevski/eyenav",
-  "version": "1.0.0",
-  "author": "Stevche Radevski (https://github.com/sradevski)",
-  "license": "MIT",
-  "engines": {
-    "brackets": ">=1.6.0"
-  },
-  "dependencies": {
-    "ws": "^1.1.0"
-  }
+    "name": "stevche.radevski.eyenav",
+    "title": "EyeNav: Eye-Tracking IDE Navigator",
+    "description": "EyeNav is a Brackets.io plugin that allows you to do simple navigation in the IDE using an eye-tracking device. It allows you to scroll, click, select text, and more using your eyes and keyboard shortcuts.",
+    "homepage": "https://github.com/sradevski/eyenav",
+    "version": "1.0.0",
+    "author": "Stevche Radevski (https://github.com/sradevski)",
+    "license": "MIT",
+    "engines": {
+        "brackets": ">=1.6.0",
+    },
+    "dependencies": {
+        "ws": "^1.1.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/sradevski/eyenav.git"
+    },
+    "bugs": {
+        "url": "https://github.com/sradevski/eyenav/issues"
+    }
 }

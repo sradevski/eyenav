@@ -7,9 +7,17 @@
     "author": "Stevche Radevski (https://github.com/sradevski)",
     "license": "MIT",
     "engines": {
-        "brackets": ">=1.6.0"
+        "brackets": ">=1.6.0",
+        "atom": "*"
     },
     "dependencies": {
         "ws": "^1.1.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/sradevski/eyenav.git"
+    },
+    "bugs": {
+        "url": "https://github.com/sradevski/eyenav/issues"
     }
 }

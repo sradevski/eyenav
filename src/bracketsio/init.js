@@ -18,7 +18,7 @@ define(function(require, exports, module) {
 				menuToggle();
 			}).appendTo('#main-toolbar .buttons');
 
-		ExtensionUtils.loadStyleSheet(module, '../eyeNav.css');
+		ExtensionUtils.loadStyleSheet(module, './eyeNav.css');
 
 		prefs.definePreference('keys', 'object', {});
 		prefs.definePreference('enabled', 'boolean', false);
